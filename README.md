@@ -19,28 +19,15 @@ Finboard is a full-stack fintech simulation for authentication, profile completi
 
 ```text
 .
-|-- backend/
-|   |-- prisma/                 # PostgreSQL banking schema and seed
-|   `-- src/
-|       |-- auth/               # Admin seed
-|       |-- banking/            # Banking service, routes, Prisma client, refund job
-|       |-- config/             # Env, MongoDB, Firebase legacy config
-|       |-- investments/        # Stock buy and portfolio APIs
-|       |-- kyc/                # KYC OCR, dummy identities, admin review
-|       |-- middleware/
-|       |-- models/             # MongoDB models
-|       |-- routes/
-|       |-- services/           # OTP service
-|       `-- server.js
-|-- frontend/
-|   `-- src/
-|       |-- components/
-|       |-- lib/
-|       |-- pages/
-|       `-- state/
-|-- DOCS/
-`-- README.md
+├── apps/customer-web/          # Next.js frontend
+├── services/                   # Microservices (auth, kyc, banking, …)
+├── packages/                   # shared, contracts, config, …
+├── infrastructure/             # storage, scripts, docker (planned)
+├── docs/
+└── .env.example
 ```
+
+See `docs/architecture/README.md` for the full service map.
 
 ## Tech Stack
 
@@ -71,32 +58,18 @@ npm run install:all
 
 Create environment files:
 
-```powershell
-Copy-Item backend\.env.example backend\.env
-Copy-Item frontend\.env.example frontend\.env
+```bash
+cp .env.example .env
+cp apps/customer-web/.env.example apps/customer-web/.env
 ```
 
-Fill the values in `backend/.env` and `frontend/.env`.
+Fill the values in `.env` and `apps/customer-web/.env`.
 
 ## Environment Variables
 
 ### Backend
 
-Required minimum values:
-
-```env
-NODE_ENV=development
-PORT=4000
-CLIENT_ORIGIN=http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>/<database>?retryWrites=true&w=majority
-BANK_DATABASE_URL=postgresql://postgres:<percent-encoded-password>@db.<project-ref>.supabase.co:5432/postgres?sslmode=require
-JWT_SECRET=replace-with-a-long-random-secret
-JWT_EXPIRES_IN=7d
-BCRYPT_SALT_ROUNDS=12
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX=5000
-UPLOAD_DIR=uploads
-```
+Use the repo root `.env` (see `.env.example`). API traffic goes through the gateway at `:4000`.
 
 Twilio/demo OTP:
 
