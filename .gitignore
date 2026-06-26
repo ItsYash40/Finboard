@@ -1,6 +1,8 @@
 node_modules/
+.cache/
 dist/
 build/
+.next/
 .env
 .env.*
 !.env.example
@@ -10,3 +12,5 @@ coverage/
 .vite/
 *firebase-adminsdk*.json
 serviceAccountKey.json
+infrastructure/storage/uploads/
+services/banking-service/generated/
