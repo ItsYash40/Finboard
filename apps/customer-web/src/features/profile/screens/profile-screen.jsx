@@ -177,19 +177,19 @@ export default function ProfilePage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="mx-auto w-full min-w-0 max-w-3xl space-y-4 sm:space-y-6">
         <Card className="overflow-hidden border-border/80">
-          <CardContent className="flex items-center gap-4 pt-6 pb-0">
-            <Avatar className="size-16 text-lg ring-2 ring-border/60">
+          <CardContent className="flex flex-col items-center gap-4 px-4 pt-5 pb-0 text-center sm:flex-row sm:items-center sm:px-6 sm:pt-6 sm:text-left">
+            <Avatar className="size-16 shrink-0 text-lg ring-2 ring-border/60 sm:size-16">
               <AvatarFallback className="bg-primary/15 font-semibold">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="min-w-0">
-              <Badge variant="secondary" className="mb-2 rounded-full text-[10px] font-semibold uppercase tracking-wide">
+            <div className="min-w-0 w-full sm:w-auto">
+              <Badge variant="secondary" className="mb-2 rounded-full text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]">
                 Your account
               </Badge>
-              <h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">
+              <h1 className="text-lg font-bold tracking-tight sm:text-2xl">
                 {profile.fullName || user?.name || "Your profile"}
               </h1>
               <p className="truncate text-sm text-muted-foreground">{user?.email}</p>
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           </CardContent>
 
           <Tabs value={activeTab} onValueChange={switchTab}>
-            <div className="border-t border-border/60 px-4 py-4 sm:px-6">
+            <div className="border-t border-border/60 px-3 py-3 sm:px-6 sm:py-4">
               <ToggleGroup
                 className="mx-auto w-full max-w-lg"
                 spacing={0}
@@ -207,24 +207,24 @@ export default function ProfilePage() {
                   if (values[0]) switchTab(values[0]);
                 }}
               >
-                <ToggleGroupItem className="flex-1 gap-2" value="personal">
-                  <UserRound className="size-4" aria-hidden />
-                  Personal details
+                <ToggleGroupItem className="h-11 flex-1 gap-1.5 px-2 text-xs sm:gap-2 sm:px-3 sm:text-sm" value="personal">
+                  <UserRound className="size-3.5 shrink-0 sm:size-4" aria-hidden />
+                  <span className="truncate">Personal</span>
                 </ToggleGroupItem>
-                <ToggleGroupItem className="flex-1 gap-2" value="security">
-                  <KeyRound className="size-4" aria-hidden />
-                  Security
+                <ToggleGroupItem className="h-11 flex-1 gap-1.5 px-2 text-xs sm:gap-2 sm:px-3 sm:text-sm" value="security">
+                  <KeyRound className="size-3.5 shrink-0 sm:size-4" aria-hidden />
+                  <span className="truncate">Security</span>
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
-          <TabsContent value="personal" className="mt-0 border-t border-border/60 px-4 py-5 sm:px-6">
-              <div className="mb-5 flex flex-row items-start justify-between gap-4">
-                <div className="space-y-1">
+          <TabsContent value="personal" className="mt-0 border-t border-border/60 px-4 py-4 sm:px-6 sm:py-5">
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="min-w-0 space-y-1">
                   <h2 className="text-lg font-semibold">Personal details</h2>
                   <p className="text-sm text-muted-foreground">PAN — {maskPan(profile.pan)}</p>
                 </div>
-                <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => setEditing((value) => !value)}>
+                <Button type="button" variant="outline" size="sm" className="h-10 w-full gap-1.5 sm:w-auto" onClick={() => setEditing((value) => !value)}>
                   <Pencil className="size-4" aria-hidden />
                   {editing ? "Cancel" : "Edit"}
                 </Button>
@@ -341,7 +341,7 @@ export default function ProfilePage() {
                         <Input value={profile.address?.postalCode || ""} onChange={(event) => updateField("address.postalCode", event.target.value)} />
                       </Field>
                     </div>
-                    <Button type="submit">Save changes</Button>
+                    <Button type="submit" className="h-11 w-full sm:w-auto">Save changes</Button>
                   </form>
                 ) : (
                   <div className="divide-y">
@@ -359,7 +359,7 @@ export default function ProfilePage() {
               </div>
           </TabsContent>
 
-          <TabsContent value="security" className="mt-0 border-t border-border/60 px-4 py-5 sm:px-6">
+          <TabsContent value="security" className="mt-0 border-t border-border/60 px-4 py-4 sm:px-6 sm:py-5">
               <div className="mb-5 space-y-1">
                 <h2 className="text-lg font-semibold">Change password</h2>
                 <p className="text-sm text-muted-foreground">Update the password you use to sign in to Finboard.</p>
@@ -393,7 +393,7 @@ export default function ProfilePage() {
                       onChange={(event) => setPasswordForm({ ...passwordForm, confirmPassword: event.target.value })}
                     />
                   </Field>
-                  <Button type="submit" disabled={changePassword.isPending}>
+                  <Button type="submit" className="h-11 w-full sm:w-auto" disabled={changePassword.isPending}>
                     {changePassword.isPending ? "Updating…" : "Update password"}
                   </Button>
                 </form>

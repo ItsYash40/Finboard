@@ -96,7 +96,7 @@ export default function KycPage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-5xl space-y-6">
+      <div className="mx-auto w-full min-w-0 max-w-5xl space-y-4 sm:space-y-6">
         {/* Hero */}
         <Card className="overflow-hidden border-border/80">
           <CardContent className="space-y-5 pt-6">
@@ -126,7 +126,7 @@ export default function KycPage() {
           />
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_0.85fr] lg:gap-6">
           {/* Submission form */}
           <Card>
             <CardHeader>

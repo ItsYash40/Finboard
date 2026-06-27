@@ -30,7 +30,7 @@ export default function KycStatusBanner({ status, tone, icon: StatusIcon, applic
 
   return (
     <Card className={cn("overflow-hidden", styles.card)}>
-      <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+      <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-5">
         <div className="flex min-w-0 items-start gap-3.5">
           <span
             className={cn(

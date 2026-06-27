@@ -1,13 +1,27 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { FileText, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  FileCheck2,
+  FolderLock,
+  ShieldCheck
+} from "lucide-react";
 import Link from "next/link";
 import { AppLayout } from "@/features/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import KycStatusBanner from "../../kyc/components/kyc-status-banner";
+import {
+  getKycStatusPresentation,
+  maskAadhaar,
+  maskPan
+} from "../../kyc/lib/kyc-status";
 import { documentsApi } from "../api/documents-api";
+import DocumentVaultCard from "../components/document-vault-card";
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL?.startsWith("http")
   ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, "")
@@ -19,114 +33,141 @@ function documentUrl(path) {
   return `${apiBase}${path}`;
 }
 
-function statusTone(status) {
-  if (status === "approved") return "border-[var(--positive-deep)]/20 bg-[var(--primary-pale)] text-[var(--positive-deep)]";
-  if (["rejected", "failed"].includes(status)) return "border-[var(--negative)]/20 bg-[var(--negative)]/10 text-[var(--negative)]";
-  return "border-[var(--warning)]/30 bg-[var(--warning)]/15 text-[var(--warning-content,#4a3b1c)]";
-}
+const statusIcons = {
+  warning: FileCheck2,
+  success: ShieldCheck,
+  danger: FileCheck2,
+  default: FolderLock
+};
 
 export default function DocumentsScreen() {
-  const application = useQuery({
+  const applicationQuery = useQuery({
     queryKey: ["documents-kyc"],
     queryFn: documentsApi.kycApplication
   });
 
-  const docs = application.data?.documents || [];
+  const application = applicationQuery.data;
+  const docs = application?.documents || [];
+  const status = getKycStatusPresentation(application);
+  const StatusIcon = statusIcons[status.tone] || FolderLock;
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-muted-foreground">Identity Vault</p>
-          <h1 className="display-sm">Your documents</h1>
-          <p className="body-lg max-w-2xl">
-            PAN and Aadhaar uploads submitted during KYC. Documents are served from the platform upload store for demo review.
-          </p>
-        </div>
+      <div className="mx-auto w-full min-w-0 max-w-5xl space-y-4 sm:space-y-6">
+        {/* Hero */}
+        <Card className="overflow-hidden border-border/80">
+          <CardContent className="space-y-2 px-4 pt-5 sm:px-6 sm:pt-6">
+            <Badge variant="secondary" className="rounded-full text-[10px] font-semibold uppercase tracking-wide sm:text-[11px]">
+              Secure document locker
+            </Badge>
+            <h1 className="text-xl font-bold tracking-tight sm:text-3xl">Your identity documents</h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+              PAN and Aadhaar you submitted during verification — stored securely and available whenever you need them.
+            </p>
+          </CardContent>
+        </Card>
 
-        {!application.data ? (
-          <Card className="finboard-card-sage">
-            <CardHeader>
-              <CardTitle>No KYC submission yet</CardTitle>
-              <CardDescription>Complete identity verification to store and review your uploaded documents here.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild>
+        {applicationQuery.isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-28 w-full rounded-2xl sm:h-24" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Skeleton className="h-72 rounded-2xl sm:h-80" />
+              <Skeleton className="h-72 rounded-2xl sm:h-80" />
+            </div>
+          </div>
+        ) : !application ? (
+          <Card className="border-dashed border-border/80 bg-muted/20">
+            <CardContent className="flex flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 sm:py-14">
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+                <FolderLock className="size-7 text-primary" aria-hidden />
+              </span>
+              <div className="max-w-md space-y-2">
+                <h2 className="text-lg font-semibold">No documents yet</h2>
+                <p className="text-sm text-muted-foreground">
+                  Complete identity verification to upload your PAN and Aadhaar. They&apos;ll appear here once submitted.
+                </p>
+              </div>
+              <Button className="mt-2 h-11 w-full max-w-xs gap-2 rounded-full sm:w-auto" asChild>
                 <Link href="/kyc">
-                  <ShieldCheck className="size-4" />
-                  Start KYC
+                  Start verification
+                  <ArrowRight className="size-4" aria-hidden />
                 </Link>
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-            <Card className="finboard-card-green h-fit">
-              <CardHeader>
-                <CardTitle className="text-base">Application status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <Badge variant="outline" className={statusTone(application.data.status)}>
-                  {application.data.status}
-                </Badge>
-                <p className="text-muted-foreground">
-                  Submitted {new Date(application.data.submittedAt || application.data.createdAt).toLocaleString("en-IN")}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">PAN:</span> {application.data.panNumber}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">Aadhaar:</span> {application.data.aadhaarNumber}
-                </p>
+          <>
+            <KycStatusBanner
+              status={status}
+              tone={status.tone}
+              icon={StatusIcon}
+              applicationStatus={application.status}
+            />
+
+            <Card className="border-border/80">
+              <CardContent className="grid grid-cols-1 gap-4 px-4 pt-5 sm:grid-cols-3 sm:px-6 sm:pt-6">
+                <div className="border-b border-border/60 pb-4 sm:border-0 sm:pb-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Submitted</p>
+                  <p className="mt-1 text-sm font-semibold leading-snug">
+                    {new Date(application.submittedAt || application.createdAt).toLocaleString("en-IN", {
+                      dateStyle: "medium",
+                      timeStyle: "short"
+                    })}
+                  </p>
+                </div>
+                <div className="border-b border-border/60 pb-4 sm:border-0 sm:pb-0">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">PAN</p>
+                  <p className="mt-1 font-mono text-sm font-semibold">{maskPan(application.panNumber)}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Aadhaar</p>
+                  <p className="mt-1 font-mono text-sm font-semibold">{maskAadhaar(application.aadhaarNumber)}</p>
+                </div>
               </CardContent>
             </Card>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {docs.length ? (
-                docs.map((document) => (
-                  <Card key={document.type} className="finboard-card">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                      <div>
-                        <CardDescription>Uploaded file</CardDescription>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                          <FileText className="size-4" />
-                          {document.type?.toUpperCase()}
-                        </CardTitle>
-                      </div>
-                      <Badge variant="secondary" className="rounded-full">
-                        {document.extractionSource || "stored"}
-                      </Badge>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {document.url && /\.(png|jpe?g|webp)$/i.test(document.url) ? (
-                        <img
-                          src={documentUrl(document.url)}
-                          alt={`${document.type} document`}
-                          className="max-h-56 w-full rounded-2xl border border-foreground/10 object-contain bg-secondary"
-                        />
-                      ) : (
-                        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-foreground/15 bg-secondary text-sm text-muted-foreground">
-                          Document preview unavailable
-                        </div>
-                      )}
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={documentUrl(document.url)} target="_blank" rel="noreferrer">
-                          Open original
-                        </a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Card className="finboard-card-sage sm:col-span-2">
-                  <CardContent className="py-8 text-sm text-muted-foreground">
-                    No document files were attached to this application.
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+            {docs.length ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {docs.map((document) => (
+                  <DocumentVaultCard
+                    key={document.type}
+                    document={document}
+                    documentUrl={documentUrl}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-10 text-center text-sm text-muted-foreground">
+                  Your application exists but no files were attached. Try resubmitting from the KYC page.
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="border-border/80 bg-muted/20">
+              <CardContent className="flex flex-col items-stretch justify-between gap-4 px-4 py-5 sm:flex-row sm:items-center sm:px-6">
+                <div className="min-w-0">
+                  <p className="font-medium">Need to update your documents?</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    If something changed or was rejected, you can upload fresh copies from verification.
+                  </p>
+                </div>
+                <Button variant="outline" className="h-11 w-full shrink-0 gap-1.5 rounded-full sm:w-auto" asChild>
+                  <Link href="/kyc">
+                    Go to verification
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </>
         )}
+
+        <Separator />
+
+        <p className="px-1 text-center text-xs leading-relaxed text-muted-foreground">
+          Documents are encrypted in transit and at rest. Only authorised reviewers can access your files.
+        </p>
       </div>
     </AppLayout>
   );
