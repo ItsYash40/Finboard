@@ -57,7 +57,7 @@ export function getServiceEnv(defaults = {}) {
       accessKeyId: process.env.S3_ACCESS_KEY || process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.S3_SECRET_KEY || process.env.AWS_SECRET_ACCESS_KEY,
       forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== "false",
-      presignExpirySeconds: Number(process.env.S3_PRESIGN_EXPIRY_SECONDS || 300)
+      presignExpirySeconds: Number(process.env.S3_PRESIGN_EXPIRY_SECONDS || 3600)
     }
   };
   return { ...base, ...defaults };

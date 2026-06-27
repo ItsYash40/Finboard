@@ -252,7 +252,7 @@ export async function listKycAdmin(req, res, next) {
       applications: await Promise.all(
         applications.map(async (app) => ({
           ...app,
-          documents: await enrichDocumentUrls(app.documents?.map(documentSummary) || []),
+          documents: (await enrichDocumentUrls(app.documents || [])).map(documentSummary),
           user: userMap.get(app.userId.toString())
         }))
       ),
@@ -292,7 +292,7 @@ export async function getKycAdmin(req, res, next) {
             aadhaarNumber: identity.aadhaarNumber
           }
         : null,
-      documents: await enrichDocumentUrls(application.documents?.map(documentSummary) || []),
+      documents: (await enrichDocumentUrls(application.documents || [])).map(documentSummary),
       checks: application.checks,
       aiVerification: application.aiVerification
     };

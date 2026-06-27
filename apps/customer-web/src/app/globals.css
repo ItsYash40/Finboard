@@ -343,7 +343,9 @@
   --body: #a0a39e;
   --positive: #4ade80;
   --positive-deep: #86efac;
+  --primary-pale: #1a3a0a;
   --negative: #f87171;
+  --warning-content: #fef3c7;
 }
 
 .dark .auth-theme {

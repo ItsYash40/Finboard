@@ -28,7 +28,7 @@ function LandingPageContent() {
   return (
     <>
       <LandingMobileSidebar active={active} onSelect={setManualActive} />
-      <div className="landing-theme min-h-screen w-full min-w-0 overflow-x-hidden bg-[var(--fb-canvas-soft)] text-[var(--fb-ink)]">
+      <div className="landing-theme min-h-screen w-full min-w-0 flex-1 overflow-x-hidden bg-[var(--fb-canvas-soft)] text-[var(--fb-ink)]">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-card focus:px-4 focus:py-2 focus:text-[var(--fb-ink)]"
@@ -69,7 +69,7 @@ function LandingPageContent() {
 export default function LandingPage() {
   return (
     <SmoothScrollProvider>
-      <SidebarProvider defaultOpen={false} className="!min-h-0 w-full">
+      <SidebarProvider defaultOpen={false} className="min-h-svh w-full">
         <LandingPageContent />
       </SidebarProvider>
     </SmoothScrollProvider>

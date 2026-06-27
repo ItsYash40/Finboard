@@ -50,6 +50,25 @@ export async function buildKycDocument(file, type, processed, userId) {
   };
 }
 
+export function resolveStorageKey(document) {
+  if (document.storageKey) {
+    return document.storageKey;
+  }
+
+  if (document.path?.startsWith("kyc/")) {
+    return document.path;
+  }
+
+  const url = String(document.url || "");
+  const fromBucket = url.match(/\/finboard-kyc\/(kyc\/[^?]+)/i);
+  if (fromBucket?.[1]) {
+    return fromBucket[1];
+  }
+
+  const fromPath = url.match(/\/(kyc\/[^?]+)/);
+  return fromPath?.[1] || null;
+}
+
 export async function enrichDocumentUrls(documents) {
   if (!isStorageEnabled() || !documents?.length) {
     return documents;
@@ -57,13 +76,13 @@ export async function enrichDocumentUrls(documents) {
 
   return Promise.all(
     documents.map(async (document) => {
-      if (!document.storageKey && !document.path?.startsWith("kyc/")) {
+      const key = resolveStorageKey(document);
+      if (!key) {
         return document;
       }
 
-      const key = document.storageKey || document.path;
       const url = await getPresignedDownloadUrl(key);
-      return url ? { ...document, url } : document;
+      return url ? { ...document, url, storageKey: document.storageKey || key } : document;
     })
   );
 }

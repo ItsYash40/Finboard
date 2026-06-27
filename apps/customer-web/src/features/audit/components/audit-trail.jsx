@@ -5,7 +5,6 @@ import { ChevronDown, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { getApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { auditApi } from "../api/audit-api";
@@ -43,7 +42,7 @@ function AuditEntryDetails({ entry }) {
   );
 }
 
-export function AuditTrail({ resourceType, resourceId, className, title = "Audit Trail", compact = false }) {
+export function AuditTrail({ resourceType, resourceId, className, title = "Audit Trail" }) {
   const auditTrail = useQuery({
     queryKey: ["audit-trail", resourceType, resourceId],
     queryFn: () => auditApi.byResource(resourceType, resourceId),
@@ -53,48 +52,57 @@ export function AuditTrail({ resourceType, resourceId, className, title = "Audit
   const entries = auditTrail.data || [];
 
   return (
-    <Card className={cn(className)}>
+    <Card className={cn("border-border/80", className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
         <div>
-          <CardDescription>Compliance</CardDescription>
+          <CardDescription>Append-only event log</CardDescription>
           <CardTitle className="flex items-center gap-2">
             <History className="size-4" />
             {title}
           </CardTitle>
         </div>
-        <Badge variant="secondary">{entries.length} events</Badge>
+        <Badge variant="secondary" className="rounded-full tabular-nums">
+          {entries.length} events
+        </Badge>
       </CardHeader>
       <CardContent>
-        <ScrollArea className={cn("rounded-lg border border-border", compact ? "h-64" : "h-[min(70vh,480px)]")}>
-          {auditTrail.isLoading ? (
-            <p className="p-4 text-sm text-muted-foreground">Loading audit history...</p>
-          ) : null}
-          {auditTrail.isError ? (
-            <p className="p-4 text-sm text-[var(--negative)]">{getApiError(auditTrail.error)}</p>
-          ) : null}
-          {!auditTrail.isLoading && !auditTrail.isError && entries.length === 0 ? (
-            <p className="p-4 text-sm text-muted-foreground">No audit events recorded yet.</p>
-          ) : null}
-          <div className="divide-y divide-border">
-            {entries.map((entry) => (
-              <div key={entry._id} className="space-y-2 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Badge variant="outline" className={cn("font-medium", actionTone(entry.action))}>
-                    {actionLabel(entry.action)}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(entry.createdAt).toLocaleString("en-IN")}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Actor: {formatActor(entry)}
-                  {entry.ipAddress ? ` · IP ${entry.ipAddress}` : ""}
-                </p>
-                <AuditEntryDetails entry={entry} />
+        {auditTrail.isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading audit history…</p>
+        ) : null}
+        {auditTrail.isError ? (
+          <p className="text-sm text-rose-700 dark:text-rose-200">{getApiError(auditTrail.error)}</p>
+        ) : null}
+        {!auditTrail.isLoading && !auditTrail.isError && entries.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No audit events recorded yet.</p>
+        ) : null}
+        <div>
+          {entries.map((entry, index) => (
+            <div
+              key={entry._id}
+              className={cn(
+                "relative space-y-2 py-4",
+                index < entries.length - 1 && "border-b border-border/40"
+              )}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Badge variant="outline" className={cn("rounded-full font-medium", actionTone(entry.action))}>
+                  {actionLabel(entry.action)}
+                </Badge>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {new Date(entry.createdAt).toLocaleString("en-IN", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </span>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+              <p className="text-xs text-muted-foreground">
+                Actor: {formatActor(entry)}
+                {entry.ipAddress ? ` · IP ${entry.ipAddress}` : ""}
+              </p>
+              <AuditEntryDetails entry={entry} />
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

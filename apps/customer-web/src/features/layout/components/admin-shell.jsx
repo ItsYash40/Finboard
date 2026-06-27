@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function AdminShell({ title, description, children }) {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
       {title ? (
         <header className="mb-6 space-y-1">
           {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}

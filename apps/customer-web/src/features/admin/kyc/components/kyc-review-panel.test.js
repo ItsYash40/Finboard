@@ -1,22 +1,22 @@
 import { describe, expect, it } from "vitest";
+import { isKycReviewable } from "@/features/admin/kyc/lib/kyc-admin-formatters";
 import {
-  statusLabel,
-  statusBadgeClass,
-  isKycReviewable,
   formatScore,
-  scoreToneClass,
+  recommendationBadgeClass,
   recommendationLabel,
-  recommendationBadgeClass
-} from "@/features/admin/kyc/components/kyc-review-panel";
+  scoreToneClass,
+  statusBadgeClass,
+  statusLabel,
+} from "@/features/admin/kyc/components/kyc-status-badges";
 
-describe("kyc-review-panel helpers", () => {
+describe("kyc admin status helpers", () => {
   it("maps known statuses to labels", () => {
     expect(statusLabel("pending_admin_review")).toBe("Pending Review");
     expect(statusLabel("approved")).toBe("Approved");
   });
 
   it("returns badge classes for approved status", () => {
-    expect(statusBadgeClass("approved")).toContain("primary-pale");
+    expect(statusBadgeClass("approved")).toContain("emerald");
   });
 
   it("allows review actions only while pending admin review", () => {
@@ -31,13 +31,13 @@ describe("kyc-review-panel helpers", () => {
   });
 
   it("maps score values to tone classes", () => {
-    expect(scoreToneClass(90)).toContain("positive-deep");
-    expect(scoreToneClass(60)).toContain("warning");
-    expect(scoreToneClass(20)).toContain("negative");
+    expect(scoreToneClass(90)).toContain("emerald");
+    expect(scoreToneClass(60)).toContain("amber");
+    expect(scoreToneClass(20)).toContain("rose");
   });
 
   it("maps AI recommendations to labels and badge classes", () => {
     expect(recommendationLabel("approve")).toBe("Recommend Approve");
-    expect(recommendationBadgeClass("reject")).toContain("negative");
+    expect(recommendationBadgeClass("reject")).toContain("rose");
   });
 });

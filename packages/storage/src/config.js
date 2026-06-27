@@ -11,7 +11,7 @@ export function getStorageConfig() {
     accessKeyId,
     secretAccessKey,
     forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== "false",
-    presignExpirySeconds: Number(process.env.S3_PRESIGN_EXPIRY_SECONDS || 300)
+    presignExpirySeconds: Number(process.env.S3_PRESIGN_EXPIRY_SECONDS || 3600)
   };
 }
 
