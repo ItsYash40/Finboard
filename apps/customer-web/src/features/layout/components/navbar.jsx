@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { FinboardMark } from "@/components/ui/finboard-logo";
 import { bankingApi } from "../../banking/api/banking-api";
 import { allInstruments } from "../../investments/data/market-data";
 import { notificationApi } from "../../notifications/api/notification-api";
@@ -126,9 +127,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-foreground/10 bg-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-6">
-        <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <span className="size-9 rounded-full bg-primary" />
-          <span className="hidden sm:inline">Finboard</span>
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <FinboardMark size={32} />
+          <span className="hidden text-[15px] font-black tracking-[-0.04em] text-foreground sm:inline">Finboard</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

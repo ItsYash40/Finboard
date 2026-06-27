@@ -16,31 +16,25 @@ import {
 import { cn } from "@/lib/utils";
 import { navLinks, navSectionIds } from "../data/content";
 import { scrollToSection, useActiveSection } from "../lib/use-active-section";
+import { FinboardMark } from "@/components/ui/finboard-logo";
 
-function FinboardMark({ compact = false }) {
+function FinboardWordmarkNav({ compact = false }) {
   return (
-    <Link href="/" className="group relative flex items-center gap-3">
-      <span
-        className={cn(
-          "relative flex shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-[var(--fb-ink)] transition-transform duration-300 group-hover:scale-[1.03]",
-          compact ? "size-8" : "size-10"
-        )}
-        aria-hidden
-      >
-        <span className="absolute inset-x-1 bottom-1.5 top-2 rounded-md bg-[var(--fb-primary)]/90" />
-        <span className="absolute inset-x-2.5 bottom-2.5 top-3.5 rounded-sm bg-[var(--fb-primary)]" />
+    <Link href="/" className="group flex items-center gap-2.5">
+      <span className="transition-transform duration-300 group-hover:scale-[1.04]">
+        <FinboardMark size={compact ? 30 : 36} />
       </span>
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-black tracking-[-0.04em] text-[var(--fb-ink)]",
-            compact ? "text-base" : "text-lg"
+            "font-black tracking-[-0.045em] text-[var(--fb-ink)]",
+            compact ? "text-[15px]" : "text-[17px]"
           )}
         >
           Finboard
         </span>
         {!compact ? (
-          <span className="mt-1 hidden text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fb-mute)] sm:inline">
+          <span className="mt-[3px] hidden text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[var(--fb-mute)] sm:inline">
             KYC · Banking · Invest
           </span>
         ) : null}
@@ -128,7 +122,7 @@ export default function LandingNav() {
               : "rounded-[22px] border border-transparent bg-white/55 px-2 py-2 backdrop-blur-sm md:px-3"
           )}
         >
-          <FinboardMark compact={scrolled} />
+          <FinboardWordmarkNav compact={scrolled} />
 
           <nav className="hidden flex-1 justify-center gap-1 lg:flex" aria-label="Primary">
             {navLinks.map((link) => (

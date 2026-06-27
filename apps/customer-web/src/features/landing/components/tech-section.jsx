@@ -8,9 +8,9 @@ export default function TechSection() {
     <SectionShell tone="white">
       <SectionInner className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
         <Reveal>
-          <Eyebrow>Technology</Eyebrow>
+          <Eyebrow>Built on solid foundations</Eyebrow>
           <p className="mt-3 max-w-md text-2xl font-bold tracking-tight text-[var(--fb-ink)]">
-            Modular monolith today. Microservices roadmap tomorrow.
+            The standards that keep your money and identity safe.
           </p>
         </Reveal>
         <Reveal delay={0.1}>

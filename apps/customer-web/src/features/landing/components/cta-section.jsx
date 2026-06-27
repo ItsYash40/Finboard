@@ -18,8 +18,8 @@ export default function CtaSection() {
                 Start the onboarding journey in under five minutes.
               </h2>
               <p className="mt-4 text-lg leading-relaxed text-[var(--fb-primary)]/75">
-                Create an account, complete KYC, verify a bank, and place your first demo investment — all in one
-                cohesive product surface.
+                Create your account, verify your identity, link your bank, and place your first investment —
+                all in one place, without switching apps or waiting days for a response.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -36,7 +36,7 @@ export default function CtaSection() {
                   variant="outline"
                   className="h-12 rounded-2xl border-[var(--fb-primary)]/40 bg-transparent px-6 text-base font-semibold text-[var(--fb-primary)] hover:bg-[var(--fb-primary)]/10"
                 >
-                  <Link href="/admin/login">Admin demo login</Link>
+                  <Link href="/signin">Sign in to your account</Link>
                 </Button>
               </div>
             </div>

@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { FinboardMark } from "@/components/ui/finboard-logo";
 
 function NavLinks({ items, pathname, onNavigate, className }) {
   return (
@@ -54,9 +55,9 @@ export default function AdminNavbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-foreground/10 bg-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-6">
-        <Link href={navItems[0]?.href || "/admin"} className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <span className="size-9 rounded-full bg-primary" />
-          <span className="hidden sm:inline">Admin Console</span>
+        <Link href={navItems[0]?.href || "/admin"} className="flex items-center gap-2">
+          <FinboardMark size={32} />
+          <span className="hidden text-[15px] font-black tracking-[-0.04em] text-foreground sm:inline">Admin Console</span>
         </Link>
 
         <NavLinks items={navItems} pathname={pathname} className="hidden md:flex" />

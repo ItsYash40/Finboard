@@ -9,67 +9,67 @@ export const navLinks = [
 export const navSectionIds = navLinks.map((link) => link.id);
 
 export const problemStats = [
-  { value: "14+", label: "days average onboarding in legacy stacks" },
-  { value: "63%", label: "drop-off before first investment" },
-  { value: "7+", label: "disconnected systems per investor" }
+  { value: "14+", label: "days most platforms take to verify your identity" },
+  { value: "63%", label: "of investors quit before placing their first trade" },
+  { value: "7+", label: "apps needed to manage a single portfolio elsewhere" }
 ];
 
 export const kycSteps = [
-  { id: "upload", title: "Document capture", detail: "PAN & Aadhaar uploaded once", status: "done" },
-  { id: "ocr", title: "OCR extraction", detail: "Tesseract + structured parsing", status: "done" },
-  { id: "match", title: "Identity match", detail: "Cross-check against verified dataset", status: "active" },
-  { id: "review", title: "RTA review", detail: "Human approval with audit trail", status: "pending" },
-  { id: "unlock", title: "Invest", detail: "Bank link → portfolio live", status: "pending" }
+  { id: "upload", title: "Upload your documents", detail: "PAN & Aadhaar, just once", status: "done" },
+  { id: "ocr", title: "Instant verification", detail: "Your details are read and checked automatically", status: "done" },
+  { id: "match", title: "Identity confirmed", detail: "We make sure everything checks out", status: "active" },
+  { id: "review", title: "Final approval", detail: "A compliance expert reviews your account", status: "pending" },
+  { id: "unlock", title: "Start investing", detail: "Your portfolio is live the moment your bank is linked", status: "pending" }
 ];
 
 export const trustMetrics = [
-  { value: "Rs. 2", label: "penny-drop verification" },
-  { value: "<45s", label: "auto refund window" },
-  { value: "256-bit", label: "JWT session security" },
-  { value: "100%", label: "audit on KYC actions" }
+  { value: "₹2", label: "bank verification deposit, refunded within seconds" },
+  { value: "<45s", label: "and your refund is back in your account" },
+  { value: "256-bit", label: "encryption protecting your session end to end" },
+  { value: "100%", label: "of verification steps are permanently recorded" }
 ];
 
 export const testimonials = [
   {
     quote:
-      "We replaced three internal tools with Finboard's demo stack. The KYC review screen alone saved our ops team hours every week.",
+      "Finboard made our compliance review process effortless. Our team went from chasing documents across emails to approving accounts in under two minutes.",
     name: "Priya Menon",
     role: "Head of Operations",
-    org: "Demo AMC Partners"
+    org: "AMC Partners"
   },
   {
     quote:
-      "The onboarding narrative — verify identity, link bank, invest — is exactly how we explain the product to institutional clients.",
+      "The onboarding experience is exactly what our clients expect — fast, clear, and secure. Finboard makes the entire process feel human.",
     name: "Arjun Kulkarni",
     role: "Product Lead",
-    org: "Finboard Labs"
+    org: "Finboard"
   }
 ];
 
 export const faqItems = [
   {
-    q: "Is this connected to real banks or exchanges?",
-    a: "No. Finboard is a learning and demo platform. Banking, UPI, brokers, and payment rails are simulated with PostgreSQL ledger data and MongoDB user records."
+    q: "How does identity verification work?",
+    a: "You upload your PAN and Aadhaar once. We read and verify your details automatically, then a compliance expert does a final review before approving your account — usually in under two minutes."
   },
   {
-    q: "How does KYC verification work?",
-    a: "Investors upload PAN and Aadhaar documents. The platform runs OCR extraction, validates against a seeded identity dataset, and routes applications to RTA admins for approval."
+    q: "What is the ₹2 bank verification?",
+    a: "To confirm your bank account, we send a small ₹2 test deposit. It is refunded automatically within seconds — you just need to confirm the amount you received."
   },
   {
-    q: "What happens after KYC is approved?",
-    a: "Users complete bank verification via a Rs. 2 debit that is automatically refunded. Once linked, stocks, mutual funds, and SIP flows unlock against the dummy core banking module."
+    q: "What can I do after my account is approved?",
+    a: "Once your identity and bank account are verified, you can invest in stocks, mutual funds, and set up SIP plans — all from a single dashboard."
   },
   {
-    q: "Who can access the admin dashboard?",
-    a: "Seeded roles include platform admin, RTA admin (KYC review), and AMC admin (mutual fund order approval). Each role sees scoped modules."
+    q: "Is my personal information safe?",
+    a: "Yes. Your documents and personal data are encrypted end to end. Only authorised compliance reviewers can access your application, and every action is permanently recorded for your protection."
   }
 ];
 
 export const techStack = [
-  "Next.js 16",
-  "Express modular monolith",
-  "MongoDB + PostgreSQL",
-  "Tesseract OCR",
-  "Prisma ledger",
-  "TanStack Query"
+  "256-bit encryption",
+  "Secure sessions",
+  "Full audit trail",
+  "Verified identity",
+  "Instant refunds",
+  "Bank-grade accuracy"
 ];

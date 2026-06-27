@@ -6,18 +6,18 @@ import { DisplayHeading, Eyebrow, Reveal, SectionInner, SectionShell } from "./p
 const pillars = [
   {
     icon: Shield,
-    title: "Role-scoped access",
-    body: "JWT middleware enforces user, admin, RTA, and AMC roles on every protected route — mirrored on the frontend with ProtectedRoute."
+    title: "Only you can see your account",
+    body: "Every role — investor, reviewer, and manager — has strictly limited access. No one can see your personal information or account activity unless they are directly responsible for it."
   },
   {
     icon: Lock,
-    title: "Audit on every KYC decision",
-    body: "Submit, approve, and reject events write append-only audit records with actor, IP, and user-agent context."
+    title: "A permanent record of every decision",
+    body: "Every step of your verification — submission, review, and approval — is permanently recorded. There is never any ambiguity about what happened or when."
   },
   {
     icon: Server,
-    title: "Secrets stay in env",
-    body: "Database URLs, JWT secrets, Twilio keys, and OpenRouter tokens live in environment configuration — never in source."
+    title: "Your data stays private",
+    body: "Your personal information and credentials are protected by industry-standard encryption at every layer — in transit and at rest."
   }
 ];
 

@@ -10,8 +10,8 @@ export default function LandingFooter() {
         <div>
           <p className="text-2xl font-black tracking-tight text-[var(--fb-primary)]">Finboard</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-[var(--fb-canvas-soft)]/80">
-            A demo-grade fintech platform for KYC onboarding, dummy core banking, and investment flows — built for
-            learning and product storytelling.
+            From identity verification to your first investment — Finboard gives you a fast, secure,
+            and fully auditable path to the markets.
           </p>
         </div>
 
@@ -40,7 +40,7 @@ export default function LandingFooter() {
       </div>
       <div className="border-t border-[var(--fb-primary)]/10">
         <p className="mx-auto max-w-[1200px] px-5 py-6 text-xs text-[var(--fb-canvas-soft)]/60 md:px-8">
-          © {new Date().getFullYear()} Finboard. Demo platform — not connected to real financial institutions.
+          © {new Date().getFullYear()} Finboard. For demonstration purposes — transaction values are simulated.
         </p>
       </div>
     </footer>

@@ -6,25 +6,32 @@ import { DisplayHeading, Eyebrow, Reveal, SectionInner, SectionShell } from "./p
 export default function TrustSection() {
   return (
     <SectionShell tone="soft">
-      <SectionInner className="text-center">
-        <Reveal>
-          <Eyebrow>Trust indicators</Eyebrow>
-          <DisplayHeading className="mx-auto mt-4 max-w-3xl text-4xl md:text-5xl">
-            Built for demos today. Architected for production tomorrow.
-          </DisplayHeading>
-        </Reveal>
+      <SectionInner>
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:items-end">
+          <Reveal>
+            <Eyebrow>Trust indicators</Eyebrow>
+            <DisplayHeading className="mt-4 text-4xl md:text-5xl">
+              Security and trust, at every step.
+            </DisplayHeading>
+          </Reveal>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {trustMetrics.map((item, index) => (
-            <Reveal
-              key={item.label}
-              delay={index * 0.07}
-              className="rounded-[28px] bg-white px-5 py-8 text-left shadow-[0_12px_40px_-24px_rgba(14,15,12,0.2)]"
-            >
-              <p className="text-3xl font-black tracking-tight text-[var(--fb-ink)]">{item.value}</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--fb-body)]">{item.label}</p>
-            </Reveal>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {trustMetrics.map((item, index) => (
+              <Reveal
+                key={item.label}
+                delay={index * 0.07}
+                className="rounded-[28px] bg-white px-5 py-8 shadow-[0_12px_40px_-24px_rgba(14,15,12,0.2)]"
+              >
+                <p
+                  className="text-3xl font-black tracking-tight text-[var(--fb-ink)]"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {item.value}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--fb-body)]">{item.label}</p>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </SectionInner>
     </SectionShell>

@@ -6,18 +6,18 @@ import { DisplayHeading, Eyebrow, Reveal, SectionInner, SectionShell } from "./p
 const shifts = [
   {
     n: "01",
-    title: "One modular platform",
-    copy: "Auth, profile, KYC, banking, and investments share a single Express monolith today — extracted into microservices when you scale."
+    title: "One seamless platform",
+    copy: "Everything from identity verification to your first investment happens in one place — no app-switching, no repeated form-filling, no waiting rooms."
   },
   {
     n: "02",
-    title: "Hybrid persistence by design",
-    copy: "MongoDB for flexible onboarding documents. PostgreSQL for ledger-grade banking. Each datastore does what it does best."
+    title: "Built for your trust",
+    copy: "Every rupee you move is tracked with bank-grade accuracy. Your personal information and transactions are stored securely and are always accessible to you."
   },
   {
     n: "03",
-    title: "Human review with machine speed",
-    copy: "OCR extracts PAN and Aadhaar fields automatically. RTA admins approve with documents, checks, and audit context side by side."
+    title: "Fast approvals, human oversight",
+    copy: "Your documents are read automatically so nothing is missed. A real compliance expert then reviews and approves your account — with full context, not just a checkbox."
   }
 ];
 
@@ -36,8 +36,8 @@ export default function PlatformShiftSection() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="max-w-xl text-lg leading-relaxed text-[var(--fb-primary)]/80">
-              Finboard replaces fragmented onboarding with a single investor journey — engineered for demo realism and
-              production-grade patterns underneath.
+              Finboard gives you one clear path from identity to investment — designed to feel as smooth for you
+              as it is trustworthy for your compliance team.
             </p>
           </Reveal>
         </div>

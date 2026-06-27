@@ -42,7 +42,7 @@ export function DisplayHeading({ children, className, as: Tag = "h2" }) {
   return (
     <Tag
       className={cn(
-        "font-black tracking-[-0.04em] text-[var(--fb-ink)] [font-family:var(--font-sans)]",
+        "font-black tracking-[-0.04em] text-[var(--fb-ink)] [font-family:var(--font-display)]",
         className
       )}
     >
