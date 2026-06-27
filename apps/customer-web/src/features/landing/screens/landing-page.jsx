@@ -16,13 +16,15 @@ import SecuritySection from "../components/security-section";
 import TechSection from "../components/tech-section";
 import TestimonialsSection from "../components/testimonials-section";
 import TrustSection from "../components/trust-section";
+import { SmoothScrollProvider } from "../lib/smooth-scroll";
 
 export default function LandingPage() {
   return (
-    <div className="landing-theme light min-h-screen bg-[var(--fb-canvas-soft)] text-[var(--fb-ink)]">
+    <SmoothScrollProvider>
+    <div className="landing-theme min-h-screen bg-[var(--fb-canvas-soft)] text-[var(--fb-ink)]">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-[var(--fb-ink)]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-card focus:px-4 focus:py-2 focus:text-[var(--fb-ink)]"
       >
         Skip to content
       </a>
@@ -53,5 +55,6 @@ export default function LandingPage() {
       </div>
       <LandingFooter />
     </div>
+    </SmoothScrollProvider>
   );
 }

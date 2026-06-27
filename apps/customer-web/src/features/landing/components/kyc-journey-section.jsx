@@ -52,7 +52,7 @@ function CheckStatusBadge({ status }) {
   return (
     <Badge
       variant="outline"
-      className="rounded-full border-amber-300/60 bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800"
+      className="rounded-full border-[var(--fb-ink)]/15 bg-[var(--fb-canvas-soft)] px-2.5 py-0.5 text-[10px] font-semibold text-[var(--fb-body)]"
     >
       <Clock className="size-3" aria-hidden />
       Review
@@ -64,7 +64,7 @@ function AdminReviewPanel() {
   const matchedCount = verificationChecks.filter((c) => c.status === "Matched").length;
 
   return (
-    <div className="mt-16 grid overflow-hidden rounded-[32px] bg-[var(--fb-ink)] lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="mt-16 grid overflow-hidden rounded-[32px] bg-[#0e0f0c] lg:grid-cols-[1.05fr_0.95fr]">
       <div className="flex flex-col justify-between gap-8 p-8 md:p-10">
         <div>
           <Badge className="rounded-full border-0 bg-[var(--fb-primary)]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--fb-primary)]">
@@ -103,8 +103,8 @@ function AdminReviewPanel() {
         </dl>
       </div>
 
-      <div className="flex items-stretch bg-[var(--fb-primary-pale)] p-5 md:p-7">
-        <Card className="flex w-full flex-col rounded-[24px] border border-[var(--fb-ink)]/8 bg-white shadow-[0_20px_60px_-28px_rgba(14,15,12,0.25)]">
+      <div className="flex items-stretch bg-[var(--fb-primary-pale)] p-5 dark:bg-[var(--fb-accent)] md:p-7">
+        <Card className="flex w-full flex-col rounded-[24px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_20px_60px_-28px_rgba(14,15,12,0.25)]">
           <CardHeader className="gap-3 border-b border-[var(--fb-ink)]/8 pb-4">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -128,7 +128,7 @@ function AdminReviewPanel() {
               </Badge>
               <Badge
                 variant="outline"
-                className="rounded-full border-amber-300/50 bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800"
+                className="rounded-full border-[var(--fb-ink)]/15 bg-[var(--fb-canvas-soft)] px-2.5 py-0.5 text-[10px] font-semibold text-[var(--fb-body)]"
               >
                 1 needs review
               </Badge>
@@ -211,7 +211,7 @@ export default function KycJourneySection() {
         <ol className="mt-14 grid gap-px overflow-hidden rounded-[28px] bg-[var(--fb-ink)]/8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {journey.map((step, index) => (
             <Reveal key={step.label} delay={index * 0.06} as="li">
-              <div className="flex h-full flex-col bg-white p-5">
+              <div className="flex h-full flex-col bg-card p-5">
                 <span className="text-xs font-semibold tabular-nums tracking-[0.22em] text-[var(--fb-mute)]">
                   {String(index + 1).padStart(2, "0")}
                 </span>

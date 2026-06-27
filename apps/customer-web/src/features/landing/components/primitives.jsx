@@ -54,8 +54,8 @@ export function DisplayHeading({ children, className, as: Tag = "h2" }) {
 export function SectionShell({ id, children, className, tone = "soft" }) {
   const tones = {
     soft: "bg-[var(--fb-canvas-soft)]",
-    white: "bg-white",
-    ink: "bg-[var(--fb-ink)] text-[var(--fb-primary)]",
+    white: "bg-card",
+    ink: "bg-[#0e0f0c] text-[var(--fb-primary)]",
     pale: "bg-[var(--fb-primary-pale)]"
   };
 

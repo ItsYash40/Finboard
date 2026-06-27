@@ -20,7 +20,7 @@ export default function BankingSection() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[28px] border border-[var(--fb-ink)]/10 bg-white p-6 md:p-8">
+            <div className="rounded-[28px] border border-[var(--fb-ink)]/10 bg-card p-6 md:p-8">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm text-[var(--fb-mute)]">Your linked account</p>

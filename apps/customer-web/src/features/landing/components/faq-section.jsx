@@ -14,7 +14,7 @@ export default function FaqSection() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <Accordion className="rounded-[28px] border border-[var(--fb-ink)]/10 bg-white px-2">
+          <Accordion className="rounded-[28px] border border-[var(--fb-ink)]/10 bg-card px-2">
             {faqItems.map((item, index) => (
               <AccordionItem key={item.q} value={`item-${index}`} className="border-[var(--fb-ink)]/8 px-4">
                 <AccordionTrigger className="py-5 text-left text-base font-semibold text-[var(--fb-ink)] hover:no-underline">

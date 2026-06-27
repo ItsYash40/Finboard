@@ -28,12 +28,12 @@ describe("kyc-status", () => {
     expect(canSubmitKyc({ status: KYC_APPLICATION_STATUS.FAILED })).toBe(true);
   });
 
-  it("shows in progress messaging for pending review", () => {
+  it("shows under review messaging for pending review", () => {
     const status = getKycStatusPresentation({
       status: KYC_APPLICATION_STATUS.PENDING_ADMIN_REVIEW
     });
 
-    expect(status.label).toBe("In Progress");
-    expect(status.description).toContain("under admin review");
+    expect(status.label).toBe("Under review");
+    expect(status.description).toContain("final check");
   });
 });

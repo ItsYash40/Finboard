@@ -10,7 +10,7 @@ export default function CtaSection() {
     <SectionShell tone="white">
       <SectionInner>
         <Reveal>
-          <div className="relative overflow-hidden rounded-[36px] bg-[var(--fb-ink)] px-6 py-12 md:px-12 md:py-16">
+          <div className="relative overflow-hidden rounded-[36px] bg-[#0e0f0c] px-6 py-12 md:px-12 md:py-16">
             <div className="pointer-events-none absolute -right-10 top-0 size-56 rounded-full bg-[var(--fb-primary)]/20 blur-3xl" aria-hidden />
             <div className="relative max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--fb-primary)]/70">Ready when you are</p>

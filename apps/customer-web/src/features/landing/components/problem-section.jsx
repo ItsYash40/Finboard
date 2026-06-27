@@ -64,7 +64,7 @@ export default function ProblemSection() {
 
         <div className="mt-14 grid gap-px overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-[var(--fb-ink)]/8 md:grid-cols-3">
           {pains.map((item, index) => (
-            <Reveal key={item.title} delay={0.12 + index * 0.08} className="h-full bg-white">
+            <Reveal key={item.title} delay={0.12 + index * 0.08} className="h-full bg-card">
               <article className="flex h-full flex-col p-6 md:p-7">
                 <p className="text-xs font-semibold tabular-nums tracking-[0.22em] text-[var(--fb-mute)]">
                   {item.index}

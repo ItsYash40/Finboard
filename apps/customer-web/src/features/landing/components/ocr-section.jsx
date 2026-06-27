@@ -24,7 +24,7 @@ export default function OcrSection() {
         </Reveal>
 
         <Reveal delay={0.12}>
-          <div className="rounded-[28px] border border-[var(--fb-ink)] bg-white p-6 font-mono text-sm shadow-[0_20px_60px_-30px_rgba(14,15,12,0.25)]">
+          <div className="rounded-[28px] border border-[var(--fb-ink)] bg-card p-6 font-mono text-sm shadow-[0_20px_60px_-30px_rgba(14,15,12,0.25)]">
             <p className="text-xs font-semibold uppercase tracking-wider text-[var(--fb-mute)]">Verified details</p>
             <pre className="mt-4 overflow-x-auto whitespace-pre-wrap rounded-2xl bg-[var(--fb-canvas-soft)] p-4 text-[13px] leading-relaxed text-[var(--fb-ink)]">
 {`{

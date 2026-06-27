@@ -1,74 +1,57 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import AuthShell from "../components/auth-shell";
-import { AuthFooterText, AuthLink } from "../components/auth-primitives";
+import AuthStepper from "../components/auth-stepper";
 import { getAuthErrorMessage, isPendingVerificationConflict } from "../lib/auth-errors";
 import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/api";
 import { useAuth } from "../context/auth-context";
 
-const initialForm = {
-  name: "",
-  email: "",
-  phone: "",
-  password: "",
-  otp: ""
-};
+const initialForm = { name: "", email: "", phone: "", password: "", otp: "" };
 
-const steps = [
-  { number: 1, label: "Your details" },
-  { number: 2, label: "Verify OTP" }
-];
+const INPUT_CLS =
+  "h-11 rounded-xl border-[var(--fb-ink)]/15 bg-[var(--fb-canvas-soft)] px-3.5 text-[var(--fb-ink)] placeholder:text-[var(--fb-mute)] focus-visible:border-[var(--fb-ink)] focus-visible:ring-0";
+
+const LABEL_CLS = "block w-full text-[13px] font-semibold text-[var(--fb-ink)]";
 
 export default function SignupPage() {
-  const [form, setForm] = useState(initialForm);
-  const [step, setStep] = useState(1);
+  const [form, setForm]       = useState(initialForm);
+  const [step, setStep]       = useState(1);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const { login } = useAuth();
-  const router = useRouter();
+  const { login }  = useAuth();
+  const router     = useRouter();
 
-  function updateField(event) {
-    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  function updateField(e) {
+    setForm((c) => ({ ...c, [e.target.name]: e.target.value }));
   }
 
-  function goToVerificationStep() {
-    setOtpSent(true);
-    setStep(2);
-  }
+  function goToVerify() { setOtpSent(true); setStep(2); }
 
   async function submitDetails(event) {
     event.preventDefault();
-
     if (!form.phone.startsWith("+")) {
-      toast.error("Use country code format, for example +919876543210");
+      toast.error("Include your country code, e.g. +919876543210");
       return;
     }
-
     setLoading(true);
     try {
       await api.post("/auth/signup", {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        password: form.password
+        name: form.name.trim(), email: form.email.trim(),
+        phone: form.phone.trim(), password: form.password,
       });
-
-      goToVerificationStep();
-      toast.success("Account created. Enter the OTP sent to your phone.");
-    } catch (error) {
-      if (isPendingVerificationConflict(error)) {
-        goToVerificationStep();
-        toast.message(getAuthErrorMessage(error));
-        return;
-      }
-
-      toast.error(getAuthErrorMessage(error));
+      goToVerify();
+      toast.success("Account created. Check your phone for the OTP.");
+    } catch (err) {
+      if (isPendingVerificationConflict(err)) { goToVerify(); toast.message(getAuthErrorMessage(err)); return; }
+      toast.error(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -80,8 +63,8 @@ export default function SignupPage() {
       await api.post("/auth/send-otp", { phone: form.phone.trim() });
       setOtpSent(true);
       toast.success("OTP sent again");
-    } catch (error) {
-      toast.error(getAuthErrorMessage(error));
+    } catch (err) {
+      toast.error(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -89,124 +72,143 @@ export default function SignupPage() {
 
   async function verifyAndComplete(event) {
     event.preventDefault();
-
     setLoading(true);
     try {
-      const response = await api.post("/auth/verify-otp", {
-        phone: form.phone.trim(),
-        otp: form.otp.trim()
-      });
-
-      if (!response.data.approved) {
-        toast.error("Invalid or expired OTP");
-        return;
-      }
-
-      if (!response.data.registrationComplete || !response.data.token) {
+      const res = await api.post("/auth/verify-otp", { phone: form.phone.trim(), otp: form.otp.trim() });
+      if (!res.data.approved) { toast.error("Invalid or expired OTP"); return; }
+      if (!res.data.registrationComplete || !res.data.token) {
         toast.error("Registration could not be completed. Check the OTP and try again.");
         return;
       }
-
-      login(response.data);
-      toast.success("Registration complete");
+      login(res.data);
+      toast.success("You're verified — welcome to Finboard!");
       router.push("/dashboard");
-    } catch (error) {
-      toast.error(getAuthErrorMessage(error));
+    } catch (err) {
+      toast.error(getAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Enter your details, then verify the OTP sent to your phone.">
-      <div className="mb-6 flex items-center justify-center gap-8">
-        {steps.map((item) => (
-          <div key={item.number} className="flex flex-col items-center gap-1 text-center">
-            <span
-              className={`flex size-8 items-center justify-center rounded-full text-sm font-semibold ${
-                step >= item.number ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {item.number}
-            </span>
-            <span className={`text-xs ${step === item.number ? "font-medium text-foreground" : "text-muted-foreground"}`}>
-              {item.label}
-            </span>
-          </div>
-        ))}
-      </div>
+    <AuthShell
+      title="Create your account"
+      subtitle="Enter your details, then verify your phone to get started."
+    >
+      <AuthStepper step={step} />
 
-      {step === 1 ? (
+      {/* Step 1 — personal details */}
+      {step === 1 && (
         <form className="space-y-4" onSubmit={submitDetails}>
-          <div className="space-y-2">
-            <Label htmlFor="name" className="auth-field-label">
-              Full name
-            </Label>
-            <Input id="name" name="name" value={form.name} onChange={updateField} required minLength={2} placeholder="Enter your name" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="auth-field-label">
-              Email
-            </Label>
-            <Input id="email" name="email" type="email" value={form.email} onChange={updateField} required placeholder="you@example.com" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="auth-field-label">
-              Phone number
-            </Label>
-            <Input id="phone" name="phone" value={form.phone} onChange={updateField} required placeholder="+919876543210" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="auth-field-label">
-              Password
-            </Label>
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="name" className={LABEL_CLS}>Full name</FieldLabel>
             <Input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={updateField}
-              required
-              minLength={8}
-              placeholder="Minimum 8 characters"
+              id="name" name="name" value={form.name} onChange={updateField}
+              placeholder="Adya Sharma"
+              className={INPUT_CLS} required minLength={2}
             />
-          </div>
-          <Button className="w-full" size="lg" disabled={loading} type="submit">
-            {loading ? "Creating account..." : "Sign up and send OTP"}
-          </Button>
-        </form>
-      ) : (
-        <form className="space-y-4" onSubmit={verifyAndComplete}>
-          <div className="rounded-lg border border-foreground/10 bg-muted/40 p-4 text-sm">
-            <p className="font-medium text-foreground">{form.name}</p>
-            <p className="text-muted-foreground">{form.email}</p>
-            <p className="text-muted-foreground">{form.phone}</p>
-            {otpSent ? (
-              <p className="mt-2 text-primary">OTP sent to your phone. Enter the code from SMS to finish registration.</p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="otp" className="auth-field-label">
-              Enter OTP
-            </Label>
-            <Input id="otp" name="otp" inputMode="numeric" value={form.otp} onChange={updateField} required placeholder="6-digit OTP" />
-          </div>
-          <div className="flex gap-2">
-            <Button className="flex-1" variant="outline" type="button" onClick={() => setStep(1)}>
-              Back
-            </Button>
-            <Button className="flex-1" variant="secondary" type="button" onClick={resendOtp} disabled={loading}>
-              Resend OTP
-            </Button>
-          </div>
-          <Button className="w-full" size="lg" disabled={loading} type="submit">
-            {loading ? "Verifying..." : "Verify OTP and complete registration"}
+          </Field>
+
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="email" className={LABEL_CLS}>Email address</FieldLabel>
+            <Input
+              id="email" name="email" type="email" value={form.email} onChange={updateField}
+              placeholder="you@example.com"
+              className={INPUT_CLS} required
+            />
+          </Field>
+
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="phone" className={LABEL_CLS}>Phone number</FieldLabel>
+            <Input
+              id="phone" name="phone" value={form.phone} onChange={updateField}
+              placeholder="+919876543210"
+              className={INPUT_CLS} required
+            />
+            <FieldDescription className="text-xs text-[var(--fb-mute)]">
+              Include your country code. We'll send an OTP to verify.
+            </FieldDescription>
+          </Field>
+
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="password" className={LABEL_CLS}>Password</FieldLabel>
+            <Input
+              id="password" name="password" type="password" value={form.password} onChange={updateField}
+              placeholder="Minimum 8 characters"
+              className={INPUT_CLS} required minLength={8}
+            />
+          </Field>
+
+          <Button
+            type="submit" disabled={loading}
+            className="mt-2 h-12 w-full rounded-2xl bg-[#0e0f0c] text-[15px] font-semibold text-[var(--fb-primary)] hover:bg-[var(--fb-ink-deep)] disabled:opacity-60"
+          >
+            {loading ? "Creating account…" : "Continue"}
           </Button>
         </form>
       )}
-      <AuthFooterText>
-        Already registered? <AuthLink href="/signin">Sign in</AuthLink>
-      </AuthFooterText>
+
+      {/* Step 2 — OTP verification */}
+      {step === 2 && (
+        <form className="space-y-4" onSubmit={verifyAndComplete}>
+          {/* Summary card */}
+          <div className="rounded-2xl border border-[var(--fb-ink)]/8 bg-[var(--fb-canvas-soft)] px-4 py-3.5">
+            <p className="text-sm font-semibold text-[var(--fb-ink)]">{form.name}</p>
+            <p className="mt-0.5 text-xs text-[var(--fb-body)]">{form.email}</p>
+            <p className="mt-0.5 text-xs text-[var(--fb-body)]">{form.phone}</p>
+            {otpSent && (
+              <p className="mt-2 text-xs font-medium text-[var(--fb-positive-deep)]">
+                OTP sent — check your SMS and enter the code below.
+              </p>
+            )}
+          </div>
+
+          <Field className="gap-1.5">
+            <FieldLabel htmlFor="otp" className={LABEL_CLS}>One-time code</FieldLabel>
+            <Input
+              id="otp" name="otp" inputMode="numeric"
+              value={form.otp} onChange={updateField}
+              placeholder="6-digit OTP"
+              className={INPUT_CLS} required
+            />
+          </Field>
+
+          {/* Secondary actions */}
+          <div className="flex gap-2">
+            <Button
+              type="button" variant="outline" onClick={() => setStep(1)}
+              className="h-11 flex-1 rounded-xl border-[var(--fb-ink)]/12 text-sm font-semibold text-[var(--fb-ink)] hover:bg-[var(--fb-canvas-soft)]"
+            >
+              Back
+            </Button>
+            <Button
+              type="button" variant="outline" onClick={resendOtp} disabled={loading}
+              className="h-11 flex-1 rounded-xl border-[var(--fb-ink)]/12 text-sm font-semibold text-[var(--fb-ink)] hover:bg-[var(--fb-canvas-soft)] disabled:opacity-50"
+            >
+              Resend OTP
+            </Button>
+          </div>
+
+          {/* Primary CTA */}
+          <Button
+            type="submit" disabled={loading}
+            className="h-12 w-full rounded-2xl bg-[var(--fb-primary)] text-[15px] font-semibold text-[var(--fb-on-primary)] hover:bg-[var(--fb-primary-active)] disabled:opacity-60"
+          >
+            {loading ? "Verifying…" : "Verify and open account"}
+          </Button>
+        </form>
+      )}
+
+      {/* Footer */}
+      <div className="mt-6">
+        <Separator className="bg-[var(--fb-ink)]/6" />
+        <p className="mt-5 text-center text-sm text-[var(--fb-mute)]">
+          Already have an account?{" "}
+          <Link href="/signin" className="font-semibold text-[var(--fb-ink)] underline-offset-4 hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
     </AuthShell>
   );
 }

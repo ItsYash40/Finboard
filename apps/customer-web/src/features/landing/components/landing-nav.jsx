@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Menu } from "lucide-react";
+import { ArrowUpRight, Menu, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -33,11 +34,7 @@ function FinboardWordmarkNav({ compact = false }) {
         >
           Finboard
         </span>
-        {!compact ? (
-          <span className="mt-[3px] hidden text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[var(--fb-mute)] sm:inline">
-            KYC · Banking · Invest
-          </span>
-        ) : null}
+        {null}
       </span>
     </Link>
   );
@@ -102,6 +99,7 @@ function NavLinkItem({ link, active, onNavigate, onSelect, variant = "desktop" }
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
   const { active, setManualActive } = useActiveSection(navSectionIds);
 
   useEffect(() => {
@@ -118,8 +116,8 @@ export default function LandingNav() {
           className={cn(
             "flex items-center justify-between gap-3 transition-all duration-500 ease-out",
             scrolled
-              ? "rounded-[22px] border border-[var(--fb-ink)]/10 bg-white/92 px-3 py-2.5 shadow-[0_16px_48px_-24px_rgba(14,15,12,0.35)] backdrop-blur-xl md:px-4"
-              : "rounded-[22px] border border-transparent bg-white/55 px-2 py-2 backdrop-blur-sm md:px-3"
+              ? "rounded-[22px] border border-[var(--fb-ink)]/10 bg-[var(--card)]/92 px-3 py-2.5 shadow-[0_16px_48px_-24px_rgba(14,15,12,0.35)] backdrop-blur-xl md:px-4"
+              : "rounded-[22px] border border-transparent bg-[var(--card)]/55 px-2 py-2 backdrop-blur-sm md:px-3"
           )}
         >
           <FinboardWordmarkNav compact={scrolled} />
@@ -131,6 +129,14 @@ export default function LandingNav() {
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hidden rounded-full p-2 text-[var(--fb-body)] transition-colors hover:text-[var(--fb-ink)] sm:inline-flex"
+              aria-label="Toggle dark mode"
+            >
+              <Sun className="size-4 dark:hidden" aria-hidden />
+              <Moon className="hidden size-4 dark:inline" aria-hidden />
+            </button>
             <Link
               href="/signin"
               className="hidden rounded-full px-3 py-2 text-sm font-semibold text-[var(--fb-body)] transition-colors hover:text-[var(--fb-ink)] sm:inline-flex"
@@ -139,7 +145,7 @@ export default function LandingNav() {
             </Link>
             <Button
               asChild
-              className="hidden h-10 gap-1.5 rounded-full bg-[var(--fb-ink)] px-4 text-sm font-semibold text-[var(--fb-primary)] hover:bg-[var(--fb-ink-deep)] sm:inline-flex"
+              className="hidden h-10 gap-1.5 rounded-full bg-[#0e0f0c] px-4 text-sm font-semibold text-[var(--fb-primary)] hover:bg-[var(--fb-ink-deep)] sm:inline-flex"
             >
               <Link href="/signup">
                 Open demo
@@ -153,7 +159,7 @@ export default function LandingNav() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="rounded-full border-[var(--fb-ink)]/12 bg-white text-[var(--fb-ink)] lg:hidden"
+                    className="rounded-full border-[var(--fb-ink)]/12 bg-card text-[var(--fb-ink)] lg:hidden"
                     aria-label="Open menu"
                   />
                 }

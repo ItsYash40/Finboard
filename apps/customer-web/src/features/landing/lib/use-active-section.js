@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getLenis } from "./smooth-scroll";
 
 function getNavOffset() {
   const nav = document.querySelector("[data-landing-nav]");
@@ -97,5 +98,10 @@ export function scrollToSection(id) {
   if (!element) return;
 
   const top = element.getBoundingClientRect().top + window.scrollY - getNavOffset() + 8;
-  window.scrollTo({ top, behavior: "smooth" });
+  const lenis = getLenis();
+  if (lenis) {
+    lenis.scrollTo(top, { duration: 1.2 });
+  } else {
+    window.scrollTo({ top, behavior: "smooth" });
+  }
 }

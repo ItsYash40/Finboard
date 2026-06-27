@@ -206,6 +206,7 @@
     --fb-canvas-soft: #e8ebe6;
     --fb-positive: #2ead4b;
     --fb-positive-deep: #054d28;
+    --fb-negative: #d03238;
     --fb-accent-cyan: #38c8ff;
     --background: #e8ebe6;
     --foreground: #0e0f0c;
@@ -221,19 +222,47 @@
     --muted-foreground: #868685;
     --accent: #e2f6d5;
     --accent-foreground: #0e0f0c;
+    --destructive: #d03238;
     --border: rgba(14, 15, 12, 0.1);
     --input: rgba(14, 15, 12, 0.12);
     --ring: #9fe870;
     color-scheme: light;
   }
 
-  /* Landing uses local Wise tokens — do not inherit global .dark palette */
-  .landing-theme,
-  .landing-theme * {
-    --background: #e8ebe6;
-    --foreground: #0e0f0c;
-    --card: #ffffff;
-    --card-foreground: #0e0f0c;
+  .dark .landing-theme,
+  .landing-theme.dark {
+    --fb-primary: #9fe870;
+    --fb-primary-active: #a9f080;
+    --fb-primary-pale: #1a3a0a;
+    --fb-on-primary: #0e0f0c;
+    --fb-ink: #e8ebe6;
+    --fb-ink-deep: #cdffad;
+    --fb-body: #a0a39e;
+    --fb-mute: #686a67;
+    --fb-canvas-soft: #141513;
+    --fb-positive: #4ade80;
+    --fb-positive-deep: #86efac;
+    --fb-negative: #f87171;
+    --fb-accent-cyan: #22d3ee;
+    --background: #141513;
+    --foreground: #e8ebe6;
+    --card: #1e1f1c;
+    --card-foreground: #e8ebe6;
+    --popover: #1e1f1c;
+    --popover-foreground: #e8ebe6;
+    --primary: #9fe870;
+    --primary-foreground: #0e0f0c;
+    --secondary: #1e1f1c;
+    --secondary-foreground: #e8ebe6;
+    --muted: #1e1f1c;
+    --muted-foreground: #686a67;
+    --accent: #1a3a0a;
+    --accent-foreground: #9fe870;
+    --destructive: #f87171;
+    --border: rgba(232, 235, 230, 0.1);
+    --input: rgba(232, 235, 230, 0.12);
+    --ring: #9fe870;
+    color-scheme: dark;
   }
 
   .landing-theme :where(a, button) {
@@ -292,4 +321,19 @@
   --sidebar-accent-foreground: #e8ebe6;
   --sidebar-border: rgba(232, 235, 230, 0.1);
   --sidebar-ring: #9fe870;
+  --ink: #e8ebe6;
+  --ink-deep: #cdffad;
+  --body: #a0a39e;
+  --positive: #4ade80;
+  --positive-deep: #86efac;
+  --negative: #f87171;
+}
+
+.dark .auth-theme {
+  --fb-canvas-soft: #111210;
+  --fb-ink: #e8ebe6;
+  --fb-ink-deep: #cdffad;
+  --fb-body: #a0a39e;
+  --fb-mute: #686a67;
+  --fb-positive-deep: #86efac;
 }

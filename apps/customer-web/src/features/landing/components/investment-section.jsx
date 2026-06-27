@@ -37,7 +37,7 @@ export default function InvestmentSection() {
 
           {/* ── Portfolio card ── */}
           <Reveal delay={0.08}>
-            <Card className="overflow-hidden rounded-[28px] bg-[var(--fb-ink)] text-[var(--fb-primary)] shadow-[0_24px_80px_-24px_rgba(14,15,12,0.35)]">
+            <Card className="overflow-hidden rounded-[28px] bg-[#0e0f0c] text-[var(--fb-primary)] shadow-[0_24px_80px_-24px_rgba(14,15,12,0.35)]">
               <CardHeader className="border-b border-white/8 px-6 pb-4 pt-6">
                 <div>
                   <CardDescription className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--fb-primary)]/55">

@@ -167,7 +167,7 @@ function KycMock() {
             Priya Menon
           </p>
         </div>
-        <Badge className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-amber-800">
+        <Badge className="rounded-full border-[var(--fb-ink)]/15 bg-[var(--fb-canvas-soft)] px-3 py-1 text-[var(--fb-body)]">
           In review
         </Badge>
       </div>
@@ -243,7 +243,7 @@ function RtaMock() {
             <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
               c.status === "Matched"
                 ? "bg-[var(--fb-primary-pale)] text-[var(--fb-positive-deep)]"
-                : "bg-amber-50 text-amber-800"
+                : "bg-[var(--fb-canvas-soft)] text-[var(--fb-body)]"
             }`}>
               {c.status}
             </span>
@@ -257,7 +257,7 @@ function RtaMock() {
         <button className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-[var(--fb-primary)] px-4 py-2 text-sm font-semibold text-[var(--fb-on-primary)]" tabIndex={-1} aria-hidden>
           <CheckCircle2 className="size-4" /> Approve
         </button>
-        <button className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl border border-[var(--fb-ink)]/12 bg-white px-4 py-2 text-sm font-semibold text-[var(--fb-ink)]" tabIndex={-1} aria-hidden>
+        <button className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl border border-[var(--fb-ink)]/12 bg-card px-4 py-2 text-sm font-semibold text-[var(--fb-ink)]" tabIndex={-1} aria-hidden>
           <XCircle className="size-4" /> Reject
         </button>
       </div>
@@ -374,7 +374,7 @@ export default function PlatformPreviewSection() {
               })}
             </TabsList>
 
-            <div className="mt-4 overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-white shadow-[0_16px_60px_-24px_rgba(14,15,12,0.14)]">
+            <div className="mt-4 overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_16px_60px_-24px_rgba(14,15,12,0.14)]">
               <div className="flex items-center justify-between border-b border-[var(--fb-ink)]/8 px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1.5" aria-hidden>
@@ -435,7 +435,7 @@ export default function PlatformPreviewSection() {
                   <div className="flex items-center gap-4">
                     <Link
                       href={activeScreen?.href ?? "/"}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[var(--fb-ink)] px-5 py-2.5 text-sm font-semibold text-[var(--fb-primary)] transition-opacity hover:opacity-90"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-[#0e0f0c] px-5 py-2.5 text-sm font-semibold text-[var(--fb-primary)] transition-opacity hover:opacity-90"
                     >
                       Open screen
                       <ArrowRight className="size-4" aria-hidden />

@@ -37,11 +37,11 @@ export default function SecuritySection() {
             <Reveal
               key={item.title}
               delay={index * 0.08}
-              className="rounded-[28px] border border-[var(--fb-primary)]/15 bg-[var(--fb-ink-deep)]/40 p-6"
+              className="group rounded-[28px] border border-[var(--fb-primary)]/20 bg-[var(--fb-primary)]/[0.06] p-7 transition-all duration-300 hover:bg-[var(--fb-primary)]/[0.1] hover:border-[var(--fb-primary)]/30"
             >
               <item.icon className="size-5 text-[var(--fb-primary)]" aria-hidden />
               <h3 className="mt-4 text-xl font-bold text-[var(--fb-primary)]">{item.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--fb-primary)]/75">{item.body}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--fb-primary)]/70">{item.body}</p>
             </Reveal>
           ))}
         </div>

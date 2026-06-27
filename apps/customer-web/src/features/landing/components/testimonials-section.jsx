@@ -19,7 +19,7 @@ export default function TestimonialsSection() {
             <Reveal
               key={item.name}
               delay={index * 0.1}
-              className="relative rounded-[28px] bg-white p-8 shadow-[0_16px_50px_-30px_rgba(14,15,12,0.2)]"
+              className="relative rounded-[28px] bg-card p-8 shadow-[0_16px_50px_-30px_rgba(14,15,12,0.2)]"
             >
               <figure>
                 <blockquote>

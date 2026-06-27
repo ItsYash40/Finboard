@@ -21,7 +21,7 @@ function PipelineVisual() {
   }, [reduce]);
 
   return (
-    <div className="relative rounded-[20px] border border-[var(--fb-ink)]/8 bg-white p-6 shadow-[0_16px_64px_-24px_rgba(14,15,12,0.18)]">
+    <div className="relative rounded-[20px] border border-[var(--fb-ink)]/8 bg-card p-6 shadow-[0_16px_64px_-24px_rgba(14,15,12,0.18)]">
       <div className="mb-5 flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--fb-mute)]">
           Live pipeline
@@ -140,7 +140,7 @@ export default function HeroSection() {
               <Button
                 asChild
                 variant="outline"
-                className="h-12 rounded-2xl border-[var(--fb-ink)] bg-white px-6 text-base font-semibold text-[var(--fb-ink)] hover:bg-white/80"
+                className="h-12 rounded-2xl border-[var(--fb-ink)] bg-card px-6 text-base font-semibold text-[var(--fb-ink)] hover:bg-[var(--card)]/80"
               >
                 <Link href="/signin">View live demo</Link>
               </Button>

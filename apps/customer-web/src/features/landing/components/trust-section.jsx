@@ -20,7 +20,7 @@ export default function TrustSection() {
               <Reveal
                 key={item.label}
                 delay={index * 0.07}
-                className="rounded-[28px] bg-white px-5 py-8 shadow-[0_12px_40px_-24px_rgba(14,15,12,0.2)]"
+                className="rounded-[28px] bg-card px-5 py-8 shadow-[0_12px_40px_-24px_rgba(14,15,12,0.2)]"
               >
                 <p
                   className="text-3xl font-black tracking-tight text-[var(--fb-ink)]"
