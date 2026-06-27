@@ -195,6 +195,7 @@
   }
 
   .landing-theme {
+    overflow-x: clip;
     --fb-primary: #9fe870;
     --fb-primary-active: #cdffad;
     --fb-primary-pale: #e2f6d5;

@@ -14,16 +14,16 @@ export default function TestimonialsSection() {
           </DisplayHeading>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-6 lg:grid-cols-2">
           {testimonials.map((item, index) => (
             <Reveal
               key={item.name}
               delay={index * 0.1}
-              className="relative rounded-[28px] bg-card p-8 shadow-[0_16px_50px_-30px_rgba(14,15,12,0.2)]"
+              className="relative rounded-[24px] bg-card p-5 shadow-[0_16px_50px_-30px_rgba(14,15,12,0.2)] sm:rounded-[28px] sm:p-8"
             >
               <figure>
                 <blockquote>
-                  <p className="text-lg leading-relaxed text-[var(--fb-ink)]">
+                  <p className="text-base leading-relaxed text-[var(--fb-ink)] sm:text-lg">
                     &ldquo;{item.quote}&rdquo;
                   </p>
                 </blockquote>

@@ -110,11 +110,11 @@ export default function LandingNav() {
   }, []);
 
   return (
-    <header data-landing-nav className="sticky top-0 z-50 px-4 pt-3 md:px-6 md:pt-4">
-      <div className="mx-auto max-w-[1180px]">
+    <header data-landing-nav className="sticky top-0 z-50 min-w-0 px-3 pt-3 sm:px-4 md:px-6 md:pt-4">
+      <div className="mx-auto min-w-0 max-w-[1180px]">
         <div
           className={cn(
-            "flex items-center justify-between gap-3 transition-all duration-500 ease-out",
+            "flex min-w-0 items-center justify-between gap-2 transition-all duration-500 ease-out sm:gap-3",
             scrolled
               ? "rounded-[22px] border border-[var(--fb-ink)]/10 bg-[var(--card)]/92 px-3 py-2.5 shadow-[0_16px_48px_-24px_rgba(14,15,12,0.35)] backdrop-blur-xl md:px-4"
               : "rounded-[22px] border border-transparent bg-[var(--card)]/55 px-2 py-2 backdrop-blur-sm md:px-3"

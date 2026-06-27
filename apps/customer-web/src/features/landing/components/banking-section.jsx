@@ -20,18 +20,18 @@ export default function BankingSection() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="rounded-[28px] border border-[var(--fb-ink)]/10 bg-card p-6 md:p-8">
-              <div className="flex items-center justify-between gap-4">
-                <div>
+            <div className="rounded-[24px] border border-[var(--fb-ink)]/10 bg-card p-4 sm:rounded-[28px] sm:p-6 md:p-8">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
                   <p className="text-sm text-[var(--fb-mute)]">Your linked account</p>
-                  <p className="mt-1 text-2xl font-black text-[var(--fb-ink)]">₹48,234.50</p>
+                  <p className="mt-1 text-xl font-black text-[var(--fb-ink)] sm:text-2xl">₹48,234.50</p>
                 </div>
-                <span className="rounded-full bg-[var(--fb-primary-pale)] px-3 py-1 text-xs font-semibold text-[var(--fb-positive-deep)]">
+                <span className="shrink-0 rounded-full bg-[var(--fb-primary-pale)] px-3 py-1 text-xs font-semibold text-[var(--fb-positive-deep)]">
                   Verified
                 </span>
               </div>
 
-              <div className="mt-8 space-y-3">
+              <div className="mt-6 space-y-3 sm:mt-8">
                 {[
                   { icon: ArrowDownLeft, label: "Verification debit", amount: "- ₹2.00", tone: "neutral" },
                   { icon: RefreshCw, label: "Auto refund", amount: "+ ₹2.00", tone: "positive" },
@@ -39,14 +39,14 @@ export default function BankingSection() {
                 ].map((row) => (
                   <div
                     key={row.label}
-                    className="flex items-center justify-between rounded-2xl bg-[var(--fb-canvas-soft)] px-4 py-3"
+                    className="flex items-center justify-between gap-3 rounded-2xl bg-[var(--fb-canvas-soft)] px-3 py-3 sm:px-4"
                   >
-                    <div className="flex items-center gap-3">
-                      <row.icon className="size-4 text-[var(--fb-ink-deep)]" aria-hidden />
-                      <span className="text-sm font-medium text-[var(--fb-ink)]">{row.label}</span>
+                    <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                      <row.icon className="size-4 shrink-0 text-[var(--fb-ink-deep)]" aria-hidden />
+                      <span className="truncate text-sm font-medium text-[var(--fb-ink)]">{row.label}</span>
                     </div>
                     <span
-                      className={`text-sm font-bold ${
+                      className={`shrink-0 text-sm font-bold ${
                         row.tone === "positive" ? "text-[var(--fb-positive-deep)]" : "text-[var(--fb-ink)]"
                       }`}
                     >

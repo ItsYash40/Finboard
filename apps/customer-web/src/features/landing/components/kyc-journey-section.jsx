@@ -64,14 +64,14 @@ function AdminReviewPanel() {
   const matchedCount = verificationChecks.filter((c) => c.status === "Matched").length;
 
   return (
-    <div className="mt-16 grid overflow-hidden rounded-[32px] bg-[#0e0f0c] lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="flex flex-col justify-between gap-8 p-8 md:p-10">
+    <div className="mt-12 grid overflow-hidden rounded-[32px] bg-[#0e0f0c] sm:mt-16 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="flex flex-col justify-between gap-6 p-5 sm:gap-8 sm:p-8 md:p-10">
         <div>
           <Badge className="rounded-full border-0 bg-[var(--fb-primary)]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--fb-primary)]">
             Compliance review
           </Badge>
           <h3
-            className="mt-4 text-3xl font-black leading-tight tracking-tight text-[var(--fb-primary)] md:text-4xl"
+            className="mt-4 text-2xl font-black leading-tight tracking-tight text-[var(--fb-primary)] sm:text-3xl md:text-4xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
             A real person reviews your account — not just an algorithm.
@@ -82,7 +82,7 @@ function AdminReviewPanel() {
           </p>
         </div>
 
-        <dl className="grid gap-4 sm:grid-cols-3">
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {[
             { k: `${matchedCount}/5`, v: "checks passed" },
             { k: "12", v: "in queue" },
@@ -103,8 +103,8 @@ function AdminReviewPanel() {
         </dl>
       </div>
 
-      <div className="flex items-stretch bg-[var(--fb-primary-pale)] p-5 dark:bg-[var(--fb-accent)] md:p-7">
-        <Card className="flex w-full flex-col rounded-[24px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_20px_60px_-28px_rgba(14,15,12,0.25)]">
+      <div className="flex items-stretch bg-[var(--fb-primary-pale)] p-4 dark:bg-[var(--fb-accent)] sm:p-5 md:p-7">
+        <Card className="flex min-w-0 w-full flex-col rounded-[24px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_20px_60px_-28px_rgba(14,15,12,0.25)]">
           <CardHeader className="gap-3 border-b border-[var(--fb-ink)]/8 pb-4">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -135,7 +135,8 @@ function AdminReviewPanel() {
             </div>
           </CardHeader>
 
-          <CardContent className="px-0 py-0">
+          <CardContent className="min-w-0 px-0 py-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-[var(--fb-ink)]/8 hover:bg-transparent">
@@ -164,11 +165,12 @@ function AdminReviewPanel() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
 
           <Separator className="bg-[var(--fb-ink)]/8" />
 
-          <CardFooter className="flex gap-2 px-6 py-4">
+          <CardFooter className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:px-6">
             <Button
               size="sm"
               className="h-10 flex-1 gap-1.5 rounded-2xl bg-[var(--fb-primary)] text-sm font-semibold text-[var(--fb-on-primary)] hover:bg-[var(--fb-primary-active)]"
@@ -208,10 +210,10 @@ export default function KycJourneySection() {
           </Reveal>
         </div>
 
-        <ol className="mt-14 grid gap-px overflow-hidden rounded-[28px] bg-[var(--fb-ink)]/8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <ol className="mt-10 grid gap-px overflow-hidden rounded-[28px] bg-[var(--fb-ink)]/8 sm:mt-14 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {journey.map((step, index) => (
             <Reveal key={step.label} delay={index * 0.06} as="li">
-              <div className="flex h-full flex-col bg-card p-5">
+              <div className="flex h-full min-w-0 flex-col bg-card p-4 sm:p-5">
                 <span className="text-xs font-semibold tabular-nums tracking-[0.22em] text-[var(--fb-mute)]">
                   {String(index + 1).padStart(2, "0")}
                 </span>

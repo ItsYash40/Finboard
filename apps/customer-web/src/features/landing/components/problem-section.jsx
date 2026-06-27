@@ -48,10 +48,10 @@ export default function ProblemSection() {
               <Reveal
                 key={stat.label}
                 delay={index * 0.08}
-                className="flex min-h-[148px] flex-col justify-between rounded-[24px] bg-[var(--fb-canvas-soft)] px-5 py-6"
+                className="flex min-h-[120px] flex-col justify-between rounded-[24px] bg-[var(--fb-canvas-soft)] px-4 py-5 sm:min-h-[148px] sm:px-5 sm:py-6"
               >
                 <p
-                  className={`text-[2.5rem] font-black leading-none tracking-tight ${statTone[stat.value] ?? "text-[var(--fb-ink)]"}`}
+                  className={`text-[2rem] font-black leading-none tracking-tight sm:text-[2.5rem] ${statTone[stat.value] ?? "text-[var(--fb-ink)]"}`}
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {stat.value}
@@ -62,10 +62,10 @@ export default function ProblemSection() {
           </div>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-[var(--fb-ink)]/8 md:grid-cols-3">
+        <div className="mt-10 grid gap-px overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-[var(--fb-ink)]/8 sm:mt-14 md:grid-cols-3">
           {pains.map((item, index) => (
             <Reveal key={item.title} delay={0.12 + index * 0.08} className="h-full bg-card">
-              <article className="flex h-full flex-col p-6 md:p-7">
+              <article className="flex h-full flex-col p-5 sm:p-6 md:p-7">
                 <p className="text-xs font-semibold tabular-nums tracking-[0.22em] text-[var(--fb-mute)]">
                   {item.index}
                 </p>

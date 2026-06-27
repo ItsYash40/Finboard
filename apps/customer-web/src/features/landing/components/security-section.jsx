@@ -32,15 +32,15 @@ export default function SecuritySection() {
           </DisplayHeading>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
           {pillars.map((item, index) => (
             <Reveal
               key={item.title}
               delay={index * 0.08}
-              className="group rounded-[28px] border border-[var(--fb-primary)]/20 bg-[var(--fb-primary)]/[0.06] p-7 transition-all duration-300 hover:bg-[var(--fb-primary)]/[0.1] hover:border-[var(--fb-primary)]/30"
+              className="group rounded-[24px] border border-[var(--fb-primary)]/20 bg-[var(--fb-primary)]/[0.06] p-5 transition-all duration-300 hover:border-[var(--fb-primary)]/30 hover:bg-[var(--fb-primary)]/[0.1] sm:rounded-[28px] sm:p-7"
             >
               <item.icon className="size-5 text-[var(--fb-primary)]" aria-hidden />
-              <h3 className="mt-4 text-xl font-bold text-[var(--fb-primary)]">{item.title}</h3>
+              <h3 className="mt-4 text-lg font-bold text-[var(--fb-primary)] sm:text-xl">{item.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--fb-primary)]/70">{item.body}</p>
             </Reveal>
           ))}

@@ -21,7 +21,7 @@ function PipelineVisual() {
   }, [reduce]);
 
   return (
-    <div className="relative rounded-[20px] border border-[var(--fb-ink)]/8 bg-card p-6 shadow-[0_16px_64px_-24px_rgba(14,15,12,0.18)]">
+    <div className="relative min-w-0 rounded-[20px] border border-[var(--fb-ink)]/8 bg-card p-4 shadow-[0_16px_64px_-24px_rgba(14,15,12,0.18)] sm:p-6">
       <div className="mb-5 flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--fb-mute)]">
           Live pipeline
@@ -85,13 +85,13 @@ function PipelineVisual() {
         })}
       </ol>
 
-      <div className="mt-5 grid grid-cols-3 gap-2 border-t border-[var(--fb-ink)]/6 pt-5">
+      <div className="mt-5 grid grid-cols-1 gap-3 border-t border-[var(--fb-ink)]/6 pt-5 sm:grid-cols-3 sm:gap-2">
         {[
-          { label: "OCR confidence", value: "94.2%" },
-          { label: "Review queue",   value: "12 pending" },
-          { label: "Time to invest", value: "4 min" },
+          { label: "Document accuracy", value: "94.2%" },
+          { label: "Typical review", value: "< 2 min" },
+          { label: "Time to invest", value: "~4 min" },
         ].map((m) => (
-          <div key={m.label}>
+          <div key={m.label} className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--fb-mute)]">
               {m.label}
             </p>
@@ -108,11 +108,11 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative mx-auto grid max-w-[1200px] gap-12 px-5 pb-20 pt-10 md:px-8 md:pb-28 md:pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pb-32 lg:pt-14">
+      <div className="relative mx-auto grid min-w-0 max-w-[1200px] gap-10 px-4 pb-16 pt-8 sm:gap-12 sm:px-5 sm:pb-20 sm:pt-10 md:px-8 md:pb-28 md:pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:pb-32 lg:pt-14">
 
-        <div>
+        <div className="min-w-0">
           <Reveal>
-            <h1 className="max-w-[14ch] text-[clamp(2.75rem,8vw,5.5rem)] font-black leading-[0.92] tracking-[-0.045em] text-[var(--fb-ink)]">
+            <h1 className="text-[clamp(2.25rem,7vw,5.5rem)] font-black leading-[0.92] tracking-[-0.045em] text-[var(--fb-ink)] sm:max-w-[14ch]">
               Onboard
               <span className="block text-[var(--fb-ink-deep)]">investors</span>
               <span className="block text-[var(--fb-body)]">without the friction.</span>
@@ -127,10 +127,10 @@ export default function HeroSection() {
           </Reveal>
 
           <Reveal delay={0.18}>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
                 asChild
-                className="h-12 gap-2 rounded-2xl bg-[var(--fb-primary)] px-6 text-base font-semibold text-[var(--fb-on-primary)] hover:bg-[var(--fb-primary-active)]"
+                className="h-11 w-full gap-2 rounded-2xl bg-[var(--fb-primary)] px-6 text-base font-semibold text-[var(--fb-on-primary)] hover:bg-[var(--fb-primary-active)] sm:h-12 sm:w-auto"
               >
                 <Link href="/signup">
                   Create investor account
@@ -140,7 +140,7 @@ export default function HeroSection() {
               <Button
                 asChild
                 variant="outline"
-                className="h-12 rounded-2xl border-[var(--fb-ink)] bg-card px-6 text-base font-semibold text-[var(--fb-ink)] hover:bg-[var(--card)]/80"
+                className="h-11 w-full rounded-2xl border-[var(--fb-ink)] bg-card px-6 text-base font-semibold text-[var(--fb-ink)] hover:bg-[var(--card)]/80 sm:h-12 sm:w-auto"
               >
                 <Link href="/signin">View live demo</Link>
               </Button>
@@ -148,14 +148,14 @@ export default function HeroSection() {
           </Reveal>
 
           <Reveal delay={0.24}>
-            <dl className="mt-12 grid max-w-lg grid-cols-3 gap-4 border-t border-[var(--fb-ink)]/10 pt-8">
+            <dl className="mt-10 grid grid-cols-1 gap-6 border-t border-[var(--fb-ink)]/10 pt-8 sm:grid-cols-3 sm:gap-4 sm:max-w-lg">
               {[
                 { k: "< 5 min", v: "from signup to first investment" },
                 { k: "₹2", v: "bank verification, refunded instantly" },
                 { k: "100%", v: "secure, audited onboarding" },
               ].map((item) => (
-                <div key={item.v}>
-                  <dt className="text-2xl font-black tracking-tight text-[var(--fb-ink)]">{item.k}</dt>
+                <div key={item.v} className="min-w-0">
+                  <dt className="text-xl font-black tracking-tight text-[var(--fb-ink)] sm:text-2xl">{item.k}</dt>
                   <dd className="mt-1 text-xs font-medium uppercase tracking-wider text-[var(--fb-mute)]">{item.v}</dd>
                 </div>
               ))}
@@ -163,7 +163,7 @@ export default function HeroSection() {
           </Reveal>
         </div>
 
-        <Reveal delay={reduce ? 0 : 0.15}>
+        <Reveal delay={reduce ? 0 : 0.15} className="min-w-0">
           <PipelineVisual />
         </Reveal>
       </div>

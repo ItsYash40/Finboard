@@ -10,9 +10,9 @@ export default function TrustSection() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:items-end">
           <Reveal>
             <Eyebrow>Trust indicators</Eyebrow>
-            <DisplayHeading className="mt-4 text-4xl md:text-5xl">
-              Security and trust, at every step.
-            </DisplayHeading>
+          <DisplayHeading className="mt-4 text-3xl sm:text-4xl md:text-5xl">
+            Security and trust, at every step.
+          </DisplayHeading>
           </Reveal>
 
           <div className="grid gap-4 sm:grid-cols-2">

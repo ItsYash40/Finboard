@@ -304,18 +304,18 @@ function BankingMock() {
       <div className="space-y-0.5">
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--fb-mute)]">Recent transactions</p>
         {txns.map((t) => (
-          <div key={t.label} className="flex items-center justify-between py-1.5">
-            <div className="flex items-center gap-2">
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+          <div key={t.label} className="flex flex-wrap items-center justify-between gap-2 py-1.5">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                 t.positive
                   ? "bg-[var(--fb-primary-pale)] text-[var(--fb-positive-deep)]"
                   : "bg-[var(--fb-canvas-soft)] text-[var(--fb-mute)]"
               }`}>
                 {t.tag}
               </span>
-              <span className="text-xs text-[var(--fb-ink)]">{t.label}</span>
+              <span className="truncate text-xs text-[var(--fb-ink)]">{t.label}</span>
             </div>
-            <span className={`text-xs font-semibold ${t.positive ? "text-[var(--fb-positive)]" : "text-[var(--fb-ink)]"}`}>
+            <span className={`shrink-0 text-xs font-semibold ${t.positive ? "text-[var(--fb-positive)]" : "text-[var(--fb-ink)]"}`}>
               {t.amount}
             </span>
           </div>
@@ -349,17 +349,16 @@ export default function PlatformPreviewSection() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <Tabs value={active} onValueChange={setActive} className="mt-12">
-            <TabsList className="mb-0 h-auto w-full flex-wrap gap-2 rounded-none bg-transparent p-0">
+          <Tabs value={active} onValueChange={setActive} className="mt-8 min-w-0 sm:mt-12">
+            <TabsList className="mb-0 grid h-auto w-full grid-cols-2 gap-2 rounded-none bg-transparent p-0 sm:flex sm:flex-wrap">
               {screens.map((screen) => {
                 const Icon = screen.icon;
-                const isActive = active === screen.id;
                 return (
                   <TabsTrigger
                     key={screen.id}
                     value={screen.id}
                     className={[
-                      "group flex h-auto flex-1 items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-200",
+                      "group flex h-auto min-w-0 items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-xs font-semibold transition-all duration-200 sm:flex-1 sm:gap-2.5 sm:px-4 sm:py-3 sm:text-sm",
                       "data-active:border-[var(--fb-ink)] data-active:bg-[var(--fb-ink)] data-active:text-[var(--fb-primary)]",
                       "border-[var(--fb-ink)]/10 bg-[var(--fb-canvas-soft)] text-[var(--fb-body)]",
                       "hover:border-[var(--fb-ink)]/25 hover:text-[var(--fb-ink)]",
@@ -374,9 +373,9 @@ export default function PlatformPreviewSection() {
               })}
             </TabsList>
 
-            <div className="mt-4 overflow-hidden rounded-[28px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_16px_60px_-24px_rgba(14,15,12,0.14)]">
-              <div className="flex items-center justify-between border-b border-[var(--fb-ink)]/8 px-6 py-4">
-                <div className="flex items-center gap-3">
+            <div className="mt-4 min-w-0 overflow-hidden rounded-[24px] border border-[var(--fb-ink)]/8 bg-card shadow-[0_16px_60px_-24px_rgba(14,15,12,0.14)] sm:rounded-[28px]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--fb-ink)]/8 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                   <div className="flex gap-1.5" aria-hidden>
                     <span className="size-2.5 rounded-full bg-[#ff5f57]" />
                     <span className="size-2.5 rounded-full bg-[#ffbd2e]" />
@@ -391,7 +390,7 @@ export default function PlatformPreviewSection() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <Badge
                     variant="outline"
                     className="rounded-full border-[var(--fb-ink)]/10 text-[var(--fb-mute)]"
@@ -408,8 +407,8 @@ export default function PlatformPreviewSection() {
                 </div>
               </div>
 
-              <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
-                <div className="flex flex-col justify-between gap-6 border-b border-[var(--fb-ink)]/8 p-6 lg:border-b-0 lg:border-r md:p-8">
+              <div className="grid min-w-0 gap-0 lg:grid-cols-[1fr_1.1fr]">
+                <div className="flex min-w-0 flex-col justify-between gap-5 border-b border-[var(--fb-ink)]/8 p-4 sm:gap-6 sm:p-6 lg:border-b-0 lg:border-r md:p-8">
                   <div>
                     <div className="flex items-center gap-2">
                       {activeScreen && (
@@ -422,7 +421,7 @@ export default function PlatformPreviewSection() {
                       </p>
                     </div>
                     <h3
-                      className="mt-4 text-2xl font-black tracking-tight text-[var(--fb-ink)] md:text-3xl"
+                      className="mt-4 text-xl font-black tracking-tight text-[var(--fb-ink)] sm:text-2xl md:text-3xl"
                       style={{ fontFamily: "var(--font-display)" }}
                     >
                       {activeScreen?.title}
@@ -432,19 +431,19 @@ export default function PlatformPreviewSection() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                     <Link
                       href={activeScreen?.href ?? "/"}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-[#0e0f0c] px-5 py-2.5 text-sm font-semibold text-[var(--fb-primary)] transition-opacity hover:opacity-90"
+                      className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#0e0f0c] px-5 py-2.5 text-sm font-semibold text-[var(--fb-primary)] transition-opacity hover:opacity-90 sm:h-auto sm:w-auto"
                     >
                       Open screen
                       <ArrowRight className="size-4" aria-hidden />
                     </Link>
-                    <span className="text-xs text-[var(--fb-mute)]">No sign-up needed</span>
+                    <span className="text-center text-xs text-[var(--fb-mute)] sm:text-left">No sign-up needed</span>
                   </div>
                 </div>
 
-                <div className="p-6 md:p-8">
+                <div className="min-w-0 overflow-x-auto p-4 sm:p-6 md:p-8">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={active}

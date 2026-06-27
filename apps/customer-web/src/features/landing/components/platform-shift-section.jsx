@@ -42,16 +42,16 @@ export default function PlatformShiftSection() {
           </Reveal>
         </div>
 
-        <div className="mt-16 space-y-0">
+        <div className="mt-12 space-y-0 sm:mt-16">
           {shifts.map((item, index) => (
             <Reveal key={item.n} delay={index * 0.08}>
               <motion.div
-                className="grid gap-4 border-t border-[var(--fb-primary)]/20 py-8 md:grid-cols-[120px_1fr_1.2fr] md:items-start"
+                className="grid gap-3 border-t border-[var(--fb-primary)]/20 py-6 sm:gap-4 sm:py-8 lg:grid-cols-[120px_1fr_1.2fr] lg:items-start"
                 whileHover={reduce ? undefined : { x: 6 }}
               >
                 <p className="text-sm font-semibold tracking-[0.3em] text-[var(--fb-primary)]/60">{item.n}</p>
-                <h3 className="text-2xl font-bold tracking-tight text-[var(--fb-primary)]">{item.title}</h3>
-                <p className="text-base leading-relaxed text-[var(--fb-primary)]/75">{item.copy}</p>
+                <h3 className="text-xl font-bold tracking-tight text-[var(--fb-primary)] sm:text-2xl">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-[var(--fb-primary)]/75 sm:text-base">{item.copy}</p>
               </motion.div>
             </Reveal>
           ))}

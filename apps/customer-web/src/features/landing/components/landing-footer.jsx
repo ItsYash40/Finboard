@@ -9,7 +9,7 @@ export default function LandingFooter() {
       <div className="relative">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--fb-primary)]/30 to-transparent" aria-hidden />
       </div>
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-5 py-16 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-12 sm:gap-10 sm:px-5 sm:py-16 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
         <div>
           <p className="text-2xl font-black tracking-tight text-[var(--fb-primary)]">Finboard</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#e8ebe6]/75">
@@ -42,7 +42,7 @@ export default function LandingFooter() {
         </div>
       </div>
       <div className="border-t border-[var(--fb-primary)]/10">
-        <p className="mx-auto max-w-[1200px] px-5 py-6 text-xs text-[#e8ebe6]/50 md:px-8">
+        <p className="mx-auto max-w-[1200px] px-4 py-5 text-xs text-[#e8ebe6]/50 sm:px-5 sm:py-6 md:px-8">
           © {new Date().getFullYear()} Finboard. For demonstration purposes — transaction values are simulated.
         </p>
       </div>

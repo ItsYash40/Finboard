@@ -67,5 +67,14 @@ export function SectionShell({ id, children, className, tone = "soft" }) {
 }
 
 export function SectionInner({ children, className }) {
-  return <div className={cn("mx-auto w-full max-w-[1200px] px-5 py-20 md:px-8 md:py-28 lg:py-32", className)}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        "mx-auto w-full min-w-0 max-w-[1200px] px-4 py-14 sm:px-5 sm:py-20 md:px-8 md:py-28 lg:py-32",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
 }
