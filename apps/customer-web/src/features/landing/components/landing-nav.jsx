@@ -6,18 +6,12 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeSelector } from "@/components/theme-selector";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from "@/components/ui/sheet";
+import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { navLinks, navSectionIds } from "../data/content";
 import { scrollToSection, useActiveSection } from "../lib/use-active-section";
 import { FinboardMark } from "@/components/ui/finboard-logo";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function FinboardWordmarkNav({ compact = false }) {
   return (
@@ -34,45 +28,19 @@ function FinboardWordmarkNav({ compact = false }) {
         >
           Finboard
         </span>
-        {null}
       </span>
     </Link>
   );
 }
 
-function NavLinkItem({ link, active, onNavigate, onSelect, variant = "desktop" }) {
+function NavLinkItem({ link, active, onSelect }) {
   const isActive = active === link.id;
 
   const handleClick = (event) => {
     event.preventDefault();
     onSelect(link.id);
     scrollToSection(link.id);
-    onNavigate?.();
   };
-
-  if (variant === "mobile") {
-    return (
-      <a
-        href={link.href}
-        onClick={handleClick}
-        className="group flex items-end justify-between border-b border-[var(--fb-ink)]/8 py-5"
-      >
-        <span className="flex flex-col gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--fb-mute)]">
-            {link.index}
-          </span>
-          <span className="text-3xl font-black tracking-[-0.03em] text-[var(--fb-ink)]">{link.label}</span>
-        </span>
-        <ArrowUpRight
-          className={cn(
-            "size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5",
-            isActive ? "text-[var(--fb-positive-deep)]" : "text-[var(--fb-mute)]"
-          )}
-          aria-hidden
-        />
-      </a>
-    );
-  }
 
   return (
     <a
@@ -97,9 +65,10 @@ function NavLinkItem({ link, active, onNavigate, onSelect, variant = "desktop" }
 }
 
 export default function LandingNav() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const { toggleSidebar } = useSidebar();
   const { active, setManualActive } = useActiveSection(navSectionIds);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -121,7 +90,7 @@ export default function LandingNav() {
         >
           <FinboardWordmarkNav compact={scrolled} />
 
-          <nav className="hidden flex-1 justify-center gap-1 lg:flex" aria-label="Primary">
+          <nav className="hidden flex-1 justify-center gap-1 md:flex" aria-label="Primary">
             {navLinks.map((link) => (
               <NavLinkItem key={link.id} link={link} active={active} onSelect={setManualActive} />
             ))}
@@ -147,70 +116,18 @@ export default function LandingNav() {
               </Link>
             </Button>
 
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full border-[var(--fb-ink)]/12 bg-card text-[var(--fb-ink)] lg:hidden"
-                    aria-label="Open menu"
-                  />
-                }
+            {isMobile ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="rounded-full border-[var(--fb-ink)]/12 bg-card text-[var(--fb-ink)] md:hidden"
+                aria-label="Open menu"
+                onClick={toggleSidebar}
               >
                 <Menu className="size-4" />
-              </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="flex h-full w-full flex-col border-[var(--fb-ink)]/10 bg-[var(--fb-canvas-soft)] p-0 sm:max-w-md"
-              >
-                <SheetHeader className="border-b border-[var(--fb-ink)]/8 px-6 py-5 text-left">
-                  <SheetTitle className="font-black tracking-[-0.03em] text-[var(--fb-ink)]">Navigate</SheetTitle>
-                  <SheetDescription className="text-[var(--fb-body)]">
-                    Walk through the product story section by section.
-                  </SheetDescription>
-                </SheetHeader>
-
-                <nav className="flex flex-col px-6" aria-label="Mobile">
-                  {navLinks.map((link) => (
-                    <NavLinkItem
-                      key={link.id}
-                      link={link}
-                      active={active}
-                      onSelect={setManualActive}
-                      variant="mobile"
-                      onNavigate={() => setMobileOpen(false)}
-                    />
-                  ))}
-                </nav>
-
-                <div className="mt-auto border-t border-[var(--fb-ink)]/8 px-6 py-6">
-                  <div className="mb-5 space-y-3">
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--fb-ink)]">Appearance</p>
-                      <p className="text-xs text-[var(--fb-body)]">Light, dark, or match your device</p>
-                    </div>
-                    <ThemeSelector variant="toggle" />
-                  </div>
-                  <Button
-                    asChild
-                    className="h-12 w-full gap-2 rounded-2xl bg-[var(--fb-primary)] text-base font-semibold text-[var(--fb-on-primary)] hover:bg-[var(--fb-primary-active)]"
-                  >
-                    <Link href="/signup" onClick={() => setMobileOpen(false)}>
-                      Start onboarding
-                      <ArrowUpRight className="size-4" aria-hidden />
-                    </Link>
-                  </Button>
-                  <Link
-                    href="/signin"
-                    onClick={() => setMobileOpen(false)}
-                    className="mt-4 block text-center text-sm font-semibold text-[var(--fb-body)] hover:text-[var(--fb-ink)]"
-                  >
-                    Already have an account? Sign in
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>

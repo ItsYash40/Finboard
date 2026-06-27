@@ -48,10 +48,10 @@ export default function Footer() {
     <footer className="mt-auto bg-[#0e0f0c] text-[#e8ebe6]">
       <div className="pointer-events-none h-px bg-gradient-to-r from-transparent via-[var(--fb-primary)]/30 to-transparent" aria-hidden />
 
-      <div className="mx-auto max-w-7xl px-6 py-14">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)] lg:items-start lg:gap-16">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)] lg:items-start lg:gap-16">
           {/* Brand column */}
-          <section className="flex flex-col gap-5">
+          <section className="flex flex-col gap-4 border-b border-[#e8ebe6]/10 pb-8 sm:gap-5 lg:border-b-0 lg:pb-0">
             <Link
               href="/dashboard"
               className="inline-flex w-fit items-center gap-2.5 transition-opacity hover:opacity-90"
@@ -83,11 +83,11 @@ export default function Footer() {
 
           {/* Nav columns */}
           <nav
-            className="grid gap-10 sm:grid-cols-3 sm:gap-8"
+            className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-8"
             aria-label="Footer navigation"
           >
             {footerGroups.map(({ title, Icon, links }) => (
-              <div key={title} className="flex flex-col gap-4">
+              <div key={title} className="flex min-w-0 flex-col gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
                   <span className="flex size-7 items-center justify-center rounded-lg bg-[var(--fb-primary)]/10 ring-1 ring-[var(--fb-primary)]/20">
                     <Icon className="size-3.5 text-[var(--fb-primary)]" aria-hidden />
@@ -100,7 +100,7 @@ export default function Footer() {
                     <li key={label}>
                       <Link
                         href={linkFor(label)}
-                        className="group inline-flex items-center gap-1 text-sm text-[#e8ebe6]/70 transition-colors hover:text-[var(--fb-primary)]"
+                        className="group inline-flex items-center gap-1 py-1 text-sm text-[#e8ebe6]/70 transition-colors hover:text-[var(--fb-primary)]"
                       >
                         {label}
                         <ArrowUpRight
@@ -119,9 +119,9 @@ export default function Footer() {
 
       <Separator className="bg-[#e8ebe6]/10" />
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-5 text-xs text-[#e8ebe6]/50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-center text-xs text-[#e8ebe6]/50 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:px-6 sm:text-left">
         <span>Finboard Simulation Suite</span>
-        <span className="max-w-xl sm:text-right">
+        <span className="mx-auto max-w-xl sm:mx-0 sm:text-right">
           For demo and education only. No real bank, exchange, broker, RTA, or AMC integration.
         </span>
       </div>

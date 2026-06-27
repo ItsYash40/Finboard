@@ -350,7 +350,7 @@ export default function PlatformPreviewSection() {
 
         <Reveal delay={0.1}>
           <Tabs value={active} onValueChange={setActive} className="mt-8 min-w-0 sm:mt-12">
-            <TabsList className="mb-0 grid h-auto w-full grid-cols-2 gap-2 rounded-none bg-transparent p-0 sm:flex sm:flex-wrap">
+            <TabsList className="relative z-10 mb-0 grid w-full grid-cols-2 gap-2 rounded-none bg-transparent p-0 !h-auto group-data-horizontal/tabs:h-auto sm:flex sm:flex-wrap">
               {screens.map((screen) => {
                 const Icon = screen.icon;
                 return (

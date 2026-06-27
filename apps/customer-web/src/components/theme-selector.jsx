@@ -11,7 +11,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 const THEMES = [
@@ -39,27 +38,42 @@ export function ThemeSelector({ variant = "menu", className, buttonClassName }) 
   useEffect(() => setMounted(true), []);
 
   if (variant === "toggle") {
+    const current = mounted ? theme : "dark";
+
     return (
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        spacing={0}
-        value={mounted ? theme : "dark"}
-        onValueChange={(value) => value && setTheme(value)}
-        className={cn("w-full sm:w-fit", className)}
+      <div
+        role="radiogroup"
+        aria-label="Theme"
+        className={cn(
+          "inline-flex w-full items-center gap-1 rounded-xl border border-border bg-muted/40 p-1 sm:w-fit",
+          className
+        )}
       >
-        {THEMES.map((item) => (
-          <ToggleGroupItem
-            key={item.value}
-            value={item.value}
-            className="h-10 flex-1 gap-1.5 px-3 sm:flex-none sm:px-4"
-            aria-label={item.label}
-          >
-            <item.icon className="size-4 shrink-0" aria-hidden />
-            <span className="text-sm">{item.label}</span>
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+        {THEMES.map((item) => {
+          const Icon = item.icon;
+          const isActive = current === item.value;
+
+          return (
+            <button
+              key={item.value}
+              type="button"
+              role="radio"
+              aria-checked={isActive}
+              aria-label={item.label}
+              onClick={() => setTheme(item.value)}
+              className={cn(
+                "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium transition-colors sm:flex-none sm:px-4",
+                isActive
+                  ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="size-4 shrink-0" aria-hidden />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
     );
   }
 
