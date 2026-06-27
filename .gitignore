@@ -10,7 +10,6 @@ coverage/
 *.log
 .DS_Store
 .vite/
-*firebase-adminsdk*.json
 serviceAccountKey.json
 infrastructure/storage/uploads/
 services/banking-service/generated/

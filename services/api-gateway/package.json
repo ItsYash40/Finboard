@@ -13,13 +13,16 @@
     "@finboard/config": "workspace:*",
     "@finboard/contracts": "workspace:*",
     "@finboard/shared": "workspace:*",
+    "@scalar/api-reference": "^1.62.0",
+    "@scalar/express-api-reference": "^0.10.6",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "http-proxy-middleware": "^3.0.5",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

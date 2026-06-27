@@ -128,7 +128,6 @@ AuthContext      TanStack Query
 | `sonner` | 2.0.7 | Toast notifications | ✅ In use |
 | `next-themes` | 0.4.6 | Theme provider (dark mode) | ✅ In use |
 | `date-fns` | 4.4.0 | Date formatting | ✅ In use |
-| `firebase` | 12.4.0 | Phone auth (client stubs) | 🟡 Scaffolded |
 | `@supabase/supabase-js` | 2.108.2 | Supabase client (stubs) | 🟡 Scaffolded |
 
 ### 3.2 Frontend Packages (Planned / Optional)
@@ -204,7 +203,6 @@ Mongoose Models                  Prisma Client
 | `morgan` | 1.10.1 | HTTP request logging | ✅ In use |
 | `cors` | 2.8.5 | Cross-origin support | ✅ In use |
 | `dotenv` | 16.6.1 | Environment variables | ✅ In use |
-| `firebase-admin` | 13.6.0 | Firebase Admin SDK | 🟡 Configured, unused |
 | `nodemon` | 3.1.10 | Dev hot reload | ✅ Dev only |
 
 ### 4.3 Backend Packages (Planned for Production)
@@ -463,11 +461,6 @@ TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_DEV_OTP=123456
 TWILIO_SHOW_OTP_IN_RESPONSE=true
-
-# Firebase Admin (optional)
-FIREBASE_PROJECT_ID=
-FIREBASE_CLIENT_EMAIL=
-FIREBASE_PRIVATE_KEY=
 ```
 
 ### 9.2 Frontend (Current)
@@ -476,8 +469,6 @@ FIREBASE_PRIVATE_KEY=
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-NEXT_PUBLIC_FIREBASE_API_KEY=
-# ... other Firebase web config keys
 ```
 
 ### 9.3 Production Additions (Planned)

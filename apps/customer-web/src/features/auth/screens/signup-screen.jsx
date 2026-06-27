@@ -19,25 +19,26 @@ const initialForm = {
   otp: ""
 };
 
+const steps = [
+  { number: 1, label: "Your details" },
+  { number: 2, label: "Verify OTP" }
+];
+
 export default function SignupPage() {
   const [form, setForm] = useState(initialForm);
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
   function updateField(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-    if (event.target.name === "phone") {
-      setOtpSent(false);
-    }
-    if (event.target.name === "phone" || event.target.name === "otp") {
-      setOtpVerified(false);
-    }
   }
 
-  async function sendOtp() {
+  async function submitDetails(event) {
+    event.preventDefault();
+
     if (!form.phone.startsWith("+")) {
       toast.error("Use country code format, for example +919876543210");
       return;
@@ -45,26 +46,43 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const response = await api.post("/auth/send-otp", { phone: form.phone.trim() });
+      const response = await api.post("/auth/signup", {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        password: form.password
+      });
+
       setOtpSent(true);
-      setOtpVerified(false);
-      if (response.data.devOtp) {
-        setForm((current) => ({ ...current, otp: response.data.devOtp }));
+      if (response.data.otp?.devOtp) {
+        setForm((current) => ({ ...current, otp: response.data.otp.devOtp }));
       }
-      toast.success("OTP sent to your phone");
+      setStep(2);
+      toast.success("Account saved. OTP sent to your phone.");
     } catch (error) {
-      setOtpSent(false);
       toast.error(getApiError(error));
     } finally {
       setLoading(false);
     }
   }
 
-  async function verifyOtp() {
-    if (!otpSent) {
-      toast.error("Send OTP first");
-      return false;
+  async function resendOtp() {
+    setLoading(true);
+    try {
+      const response = await api.post("/auth/send-otp", { phone: form.phone.trim() });
+      if (response.data.devOtp) {
+        setForm((current) => ({ ...current, otp: response.data.devOtp }));
+      }
+      toast.success("OTP sent again");
+    } catch (error) {
+      toast.error(getApiError(error));
+    } finally {
+      setLoading(false);
     }
+  }
+
+  async function verifyAndComplete(event) {
+    event.preventDefault();
 
     setLoading(true);
     try {
@@ -75,43 +93,16 @@ export default function SignupPage() {
 
       if (!response.data.approved) {
         toast.error("Invalid or expired OTP");
-        return false;
+        return;
       }
 
-      setOtpVerified(true);
-      toast.success("Phone number verified");
-      return true;
-    } catch (error) {
-      toast.error(getApiError(error));
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }
+      if (!response.data.registrationComplete || !response.data.token) {
+        toast.error("Registration could not be completed. Try again.");
+        return;
+      }
 
-  async function submit(event) {
-    event.preventDefault();
-
-    if (!otpSent) {
-      toast.error("Send OTP before creating the account");
-      return;
-    }
-
-    if (!otpVerified && !(await verifyOtp())) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await api.post("/auth/signup", {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        password: form.password,
-        otp: form.otp
-      });
       login(response.data);
-      toast.success("Account created securely");
+      toast.success("Registration complete");
       router.push("/dashboard");
     } catch (error) {
       toast.error(getApiError(error));
@@ -121,61 +112,90 @@ export default function SignupPage() {
   }
 
   return (
-    <AuthShell title="Create your account" subtitle="Twilio SMS OTP is required before the account is stored in MongoDB.">
-      <form className="space-y-4" onSubmit={submit}>
-        <div className="space-y-2">
-          <Label htmlFor="name" className="auth-field-label">
-            Full name
-          </Label>
-          <Input id="name" name="name" value={form.name} onChange={updateField} required minLength={2} placeholder="Enter your name" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email" className="auth-field-label">
-            Email
-          </Label>
-          <Input id="email" name="email" type="email" value={form.email} onChange={updateField} required placeholder="you@example.com" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="auth-field-label">
-            Phone number
-          </Label>
-          <div className="flex gap-2">
+    <AuthShell title="Create your account" subtitle="Enter your details first. We send OTP next, then you verify to finish.">
+      <div className="mb-6 flex items-center justify-center gap-8">
+        {steps.map((item) => (
+          <div key={item.number} className="flex flex-col items-center gap-1 text-center">
+            <span
+              className={`flex size-8 items-center justify-center rounded-full text-sm font-semibold ${
+                step >= item.number ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {item.number}
+            </span>
+            <span className={`text-xs ${step === item.number ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {step === 1 ? (
+        <form className="space-y-4" onSubmit={submitDetails}>
+          <div className="space-y-2">
+            <Label htmlFor="name" className="auth-field-label">
+              Full name
+            </Label>
+            <Input id="name" name="name" value={form.name} onChange={updateField} required minLength={2} placeholder="Enter your name" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="auth-field-label">
+              Email
+            </Label>
+            <Input id="email" name="email" type="email" value={form.email} onChange={updateField} required placeholder="you@example.com" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="auth-field-label">
+              Phone number
+            </Label>
             <Input id="phone" name="phone" value={form.phone} onChange={updateField} required placeholder="+919876543210" />
-            <Button type="button" variant="secondary" size="sm" onClick={sendOtp} disabled={loading || otpSent}>
-              {otpSent ? "Sent" : "Send OTP"}
-            </Button>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="otp" className="auth-field-label">
-            OTP
-          </Label>
-          <div className="flex gap-2">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="auth-field-label">
+              Password
+            </Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={updateField}
+              required
+              minLength={8}
+              placeholder="Minimum 8 characters"
+            />
+          </div>
+          <Button className="w-full" size="lg" disabled={loading} type="submit">
+            {loading ? "Creating account..." : "Sign up and send OTP"}
+          </Button>
+        </form>
+      ) : (
+        <form className="space-y-4" onSubmit={verifyAndComplete}>
+          <div className="rounded-lg border border-foreground/10 bg-muted/40 p-4 text-sm">
+            <p className="font-medium text-foreground">{form.name}</p>
+            <p className="text-muted-foreground">{form.email}</p>
+            <p className="text-muted-foreground">{form.phone}</p>
+            {otpSent ? <p className="mt-2 text-primary">OTP sent to your phone</p> : null}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="otp" className="auth-field-label">
+              Enter OTP
+            </Label>
             <Input id="otp" name="otp" inputMode="numeric" value={form.otp} onChange={updateField} required placeholder="6-digit OTP" />
-            <Button type="button" variant="secondary" size="sm" onClick={verifyOtp} disabled={loading || !otpSent || otpVerified}>
-              {otpVerified ? "Verified" : "Verify"}
+          </div>
+          <div className="flex gap-2">
+            <Button className="flex-1" variant="outline" type="button" onClick={() => setStep(1)}>
+              Back
+            </Button>
+            <Button className="flex-1" variant="secondary" type="button" onClick={resendOtp} disabled={loading}>
+              Resend OTP
             </Button>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password" className="auth-field-label">
-            Password
-          </Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={updateField}
-            required
-            minLength={8}
-            placeholder="Minimum 8 characters"
-          />
-        </div>
-        <Button className="w-full" size="lg" disabled={loading} type="submit">
-          {loading ? "Securing account..." : "Sign up and continue"}
-        </Button>
-      </form>
+          <Button className="w-full" size="lg" disabled={loading} type="submit">
+            {loading ? "Verifying..." : "Verify OTP and complete registration"}
+          </Button>
+        </form>
+      )}
       <AuthFooterText>
         Already registered? <AuthLink href="/signin">Sign in</AuthLink>
       </AuthFooterText>

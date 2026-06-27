@@ -31,11 +31,6 @@ export function getServiceEnv(defaults = {}) {
       otpTtlMinutes: Number(process.env.TWILIO_OTP_TTL_MINUTES || 5),
       devOtp: process.env.TWILIO_DEV_OTP || "123456"
     },
-    firebase: {
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n")
-    },
     smtp: {
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),

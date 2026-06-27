@@ -93,7 +93,7 @@ OPENROUTER_API_KEY=
 OPENROUTER_MODEL=openai/gpt-4o-mini
 ```
 
-Firebase variables are still present for compatibility with older files, but the current OTP flow is backend/Twilio based.
+Phone OTP uses Twilio in production and the dev fallback (`TWILIO_DEV_OTP=123456`) locally.
 
 ### Frontend
 

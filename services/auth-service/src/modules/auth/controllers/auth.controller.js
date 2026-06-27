@@ -1,22 +1,8 @@
 import { User } from "../models/user.model.js";
 import { createInitialProfile } from "@finboard/contracts";
-import { verifyFirebasePhoneToken } from "../services/firebase-auth.service.js";
 import { sendPhoneOtp, verifyPhoneOtp, verifyPhoneOtpDetailed } from "../services/otp.service.js";
 import { sendPasswordResetOtp, verifyPasswordResetOtp } from "../services/email.service.js";
 import { signJwt } from "../../../common/helpers/jwt.helper.js";
-
-async function assertPhoneVerified(phone, { otp, firebaseIdToken }) {
-  if (firebaseIdToken) {
-    return verifyFirebasePhoneToken(firebaseIdToken, phone);
-  }
-
-  const otpVerified = await verifyPhoneOtp(phone, otp);
-  if (!otpVerified) {
-    throw Object.assign(new Error("Invalid or expired OTP"), { statusCode: 401 });
-  }
-
-  return null;
-}
 
 export async function sendOtp(req, res, next) {
   try {
@@ -38,8 +24,41 @@ export async function sendOtp(req, res, next) {
 export async function verifyOtp(req, res, next) {
   try {
     const result = await verifyPhoneOtpDetailed(req.body.phone, req.body.otp);
+
+    if (!result.approved) {
+      return res.json({
+        message: "Invalid or expired OTP",
+        registrationComplete: false,
+        ...result
+      });
+    }
+
+    const pendingUser = await User.findOne({ phone: req.body.phone, phoneVerified: false });
+
+    if (pendingUser) {
+      pendingUser.phoneVerified = true;
+      pendingUser.lastLoginAt = new Date();
+      await pendingUser.save();
+
+      await createInitialProfile({
+        userId: pendingUser._id,
+        fullName: pendingUser.name,
+        mobileNumber: pendingUser.phone,
+        emailAddress: pendingUser.email
+      }).catch(() => {});
+
+      return res.json({
+        message: "Registration complete",
+        registrationComplete: true,
+        token: signJwt(pendingUser),
+        user: pendingUser.toSafeJSON(),
+        ...result
+      });
+    }
+
     return res.json({
-      message: result.approved ? "OTP verified successfully" : "Invalid or expired OTP",
+      message: "OTP verified successfully",
+      registrationComplete: false,
       ...result
     });
   } catch (error) {
@@ -49,11 +68,15 @@ export async function verifyOtp(req, res, next) {
 
 export async function signup(req, res, next) {
   try {
-    const { name, email, phone, password, otp, firebaseIdToken } = req.body;
-    const firebaseAuth = await assertPhoneVerified(phone, { otp, firebaseIdToken });
+    const { name, email, phone, password } = req.body;
 
     const existing = await User.findOne({ $or: [{ email }, { phone }] });
     if (existing) {
+      if (!existing.phoneVerified) {
+        return res.status(409).json({
+          message: "An account with this email or phone is pending verification. Verify OTP or use a different email/phone."
+        });
+      }
       return res.status(409).json({ message: "Email or phone number is already registered" });
     }
 
@@ -61,21 +84,23 @@ export async function signup(req, res, next) {
       name,
       email,
       phone,
-      phoneVerified: true,
-      firebaseUid: firebaseAuth?.uid
+      phoneVerified: false
     });
     await user.setPassword(password);
     await user.save();
 
-    await createInitialProfile({
-      userId: user._id,
-      fullName: name,
-      mobileNumber: phone,
-      emailAddress: email
-    });
+    const otpResult = await sendPhoneOtp(phone);
 
-    const token = signJwt(user);
-    return res.status(201).json({ token, user: user.toSafeJSON() });
+    return res.status(201).json({
+      message: "Account created. OTP sent to your phone for verification.",
+      requiresPhoneVerification: true,
+      registrationComplete: false,
+      user: user.toSafeJSON(),
+      otp: {
+        provider: otpResult.provider,
+        devOtp: otpResult.devOtp
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -88,6 +113,10 @@ export async function signin(req, res, next) {
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    if (!user.phoneVerified) {
+      return res.status(403).json({ message: "Complete phone verification before signing in" });
     }
 
     user.lastLoginAt = new Date();

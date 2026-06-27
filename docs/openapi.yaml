@@ -1,0 +1,1535 @@
+openapi: 3.1.0
+info:
+  title: Finboard API
+  version: 1.0.0
+  description: |
+    Finboard KYC, banking, and investment platform API.
+
+    All routes are served through the **API Gateway** at http://localhost:4000.
+    Authenticated routes require a JWT in the header: Authorization Bearer token.
+
+    ## New user registration (test in this order)
+
+    1. POST /api/auth/signup — name, email, phone, password (no OTP in body).
+    2. OTP is sent automatically. In local dev, use 123456 from otp.devOtp in the response.
+    3. POST /api/auth/verify-otp — phone + OTP returns JWT when registrationComplete is true.
+
+    Optional: POST /api/auth/send-otp to resend OTP if it expired.
+
+    Sign-in is blocked (403) until phoneVerified is true.
+
+    Seeded accounts: see AUTH_CREDENTIALS.md in the repo root.
+  contact:
+    name: Finboard
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Local API Gateway
+
+tags:
+  - name: Health
+    description: Gateway health check
+  - name: Auth
+    description: |
+      Authentication APIs.
+
+      **Registration:** `signup` → OTP sent automatically → `verify-otp` → JWT.
+
+      **Login:** `signin`, `admin/signin`, or `phone-login` (after `send-otp`).
+  - name: Profile
+    description: Investor profile
+  - name: KYC
+    description: KYC submission and admin review
+  - name: Banking
+    description: Bank verification, transfers, admin banking
+  - name: Investments
+    description: Portfolio, orders, SIP, AMC admin
+  - name: Notifications
+    description: In-app notifications
+  - name: Audit
+    description: Admin audit trail
+
+security: []
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Gateway health check
+      operationId: getHealth
+      responses:
+        "200":
+          description: Gateway is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /api/auth/signup:
+    post:
+      tags: [Auth]
+      summary: "Step 1 — Register (details only, OTP sent automatically)"
+      description: |
+        Creates a user with `phoneVerified: false` and sends OTP to the phone.
+
+        **No OTP in the request body.** After this call, use `POST /api/auth/verify-otp`.
+
+        Local dev OTP is always `123456` (see `otp.devOtp` in the response).
+      operationId: authSignup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+            example:
+              name: Test User
+              email: newuser@finboard.local
+              phone: "+919900007777"
+              password: User@12345
+            examples:
+              newUser:
+                summary: New test user (recommended)
+                value:
+                  name: Test User
+                  email: newuser@finboard.local
+                  phone: "+919900007777"
+                  password: User@12345
+      responses:
+        "201":
+          description: Account created — verify OTP next (no JWT yet)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignupPendingResponse"
+              examples:
+                pending:
+                  summary: OTP sent in dev
+                  value:
+                    message: Account created. OTP sent to your phone for verification.
+                    requiresPhoneVerification: true
+                    registrationComplete: false
+                    user:
+                      id: 6a3f6150dcb58ca317be67e2
+                      name: Test User
+                      email: newuser@finboard.local
+                      phone: "+919900007777"
+                      role: user
+                      phoneVerified: false
+                      emailVerified: false
+                    otp:
+                      provider: development
+                      devOtp: "123456"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          description: Email or phone already registered (or pending verification)
+
+  /api/auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: "Step 2 — Verify OTP and complete registration"
+      description: |
+        Call after `POST /api/auth/signup` with the same phone number and the OTP received.
+
+        When a pending registration exists, returns `registrationComplete: true` and a JWT `token`.
+
+        Use the token in Scalar **Authorize** as `Bearer <token>` for protected routes.
+      operationId: authVerifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtpRequest"
+            examples:
+              completeRegistration:
+                summary: Complete signup after step 1
+                value:
+                  phone: "+919900007777"
+                  otp: "123456"
+      responses:
+        "200":
+          description: OTP result (JWT included when registration completes)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyOtpResponse"
+              examples:
+                registrationComplete:
+                  summary: Registration finished
+                  value:
+                    message: Registration complete
+                    registrationComplete: true
+                    approved: true
+                    provider: development
+                    status: approved
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    user:
+                      id: 6a3f6150dcb58ca317be67e2
+                      name: Test User
+                      email: newuser@finboard.local
+                      phone: "+919900007777"
+                      role: user
+                      phoneVerified: true
+                      emailVerified: false
+                invalidOtp:
+                  summary: Wrong OTP
+                  value:
+                    message: Invalid or expired OTP
+                    registrationComplete: false
+                    approved: false
+                    provider: development
+                    status: pending
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/auth/send-otp:
+    post:
+      tags: [Auth]
+      summary: Resend phone OTP (optional)
+      description: |
+        **Not required for new signup** — OTP is sent automatically by `POST /api/auth/signup`.
+
+        Use to resend OTP if it expired, or before `POST /api/auth/phone-login`.
+
+        Local dev OTP is `123456`.
+      operationId: authSendOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendOtpRequest"
+            examples:
+              resend:
+                summary: Resend OTP
+                value:
+                  phone: "+919900007777"
+      responses:
+        "200":
+          description: OTP sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendOtpResponse"
+              examples:
+                dev:
+                  value:
+                    message: OTP sent successfully
+                    provider: development
+                    devOtp: "123456"
+
+  /api/auth/signin:
+    post:
+      tags: [Auth]
+      summary: Sign in with email and password
+      description: |
+        Requires `phoneVerified: true`. Pending registrations must complete `verify-otp` first.
+      operationId: authSignin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SigninRequest"
+            examples:
+              demoUser:
+                summary: Seeded demo user (Rahul)
+                value:
+                  email: user@finboard.local
+                  password: User@12345
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Phone not verified — complete signup with verify-otp first
+
+  /api/auth/admin/signin:
+    post:
+      tags: [Auth]
+      summary: Admin sign in
+      description: Validates admin role (`admin`, `rta_admin`, or `amc_admin`). `adminRole` must match the account.
+      operationId: authAdminSignin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminSigninRequest"
+            examples:
+              kycAdmin:
+                summary: KYC Review Admin
+                value:
+                  email: admin@finboard.local
+                  password: Admin@12345
+                  adminRole: admin
+              rtaAdmin:
+                summary: RTA Admin
+                value:
+                  email: rta.admin@finboard.local
+                  password: RtaAdmin@12345
+                  adminRole: rta_admin
+      responses:
+        "200":
+          description: Admin login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: User is not an admin for the selected role
+
+  /api/auth/phone-login:
+    post:
+      tags: [Auth]
+      summary: Sign in with phone OTP
+      description: |
+        **Flow:** `POST /api/auth/send-otp` → enter OTP here.
+
+        Account must already exist and be phone-verified (seeded users or completed signup).
+      operationId: authPhoneLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtpRequest"
+            examples:
+              rahul:
+                summary: Phone login (after send-otp)
+                value:
+                  phone: "+919876543210"
+                  otp: "123456"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: No account for this phone number
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      operationId: authMe
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/change-password:
+    patch:
+      tags: [Auth]
+      summary: Change password
+      description: Requires JWT from signin or completed registration.
+      operationId: authChangePassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+            examples:
+              change:
+                value:
+                  currentPassword: User@12345
+                  newPassword: NewPass@12345
+      responses:
+        "200":
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password updated successfully
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset OTP
+      description: In local dev, `devOtp` is returned when the email exists (`123456`).
+      operationId: authForgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+            examples:
+              demoUser:
+                value:
+                  email: user@finboard.local
+      responses:
+        "200":
+          description: Reset OTP sent (or logged in dev)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForgotPasswordResponse"
+
+  /api/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password with email OTP
+      description: Call `forgot-password` first on the same email.
+      operationId: authResetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+            examples:
+              reset:
+                value:
+                  email: user@finboard.local
+                  otp: "123456"
+                  newPassword: User@12345
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/profile/me:
+    get:
+      tags: [Profile]
+      summary: Get my profile
+      operationId: getProfile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profile record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: "#/components/schemas/Profile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      tags: [Profile]
+      summary: Update my profile
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdateRequest"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: "#/components/schemas/Profile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/kyc/me:
+    get:
+      tags: [KYC]
+      summary: Get my KYC application
+      operationId: getMyKyc
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: KYC application (or null)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application:
+                    $ref: "#/components/schemas/KycApplication"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/kyc/submit:
+    post:
+      tags: [KYC]
+      summary: Submit KYC application
+      description: |
+        Multipart upload with PAN and Aadhaar document images.
+        Name, PAN, and Aadhaar must match a seeded identity (`pnpm seed:kyc`).
+      operationId: submitKyc
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, panNumber, aadhaarNumber, pan, aadhaar]
+              properties:
+                name:
+                  type: string
+                  example: Rahul Sharma
+                panNumber:
+                  type: string
+                  example: ABCPS1234F
+                aadhaarNumber:
+                  type: string
+                  example: "111222333445"
+                pan:
+                  type: string
+                  format: binary
+                aadhaar:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: KYC submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application:
+                    $ref: "#/components/schemas/KycApplication"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/kyc/admin/applications:
+    get:
+      tags: [KYC]
+      summary: List all KYC applications (admin)
+      operationId: listKycApplications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Application list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/KycApplication"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/kyc/admin/applications/{id}:
+    get:
+      tags: [KYC]
+      summary: Get KYC application detail (admin)
+      operationId: getKycApplication
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Application detail with OCR and identity match data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application:
+                    $ref: "#/components/schemas/KycApplication"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/kyc/admin/applications/{id}/approve:
+    post:
+      tags: [KYC]
+      summary: Approve KYC application
+      operationId: approveKyc
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                remarks:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Application approved
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/kyc/admin/applications/{id}/reject:
+    post:
+      tags: [KYC]
+      summary: Reject KYC application
+      operationId: rejectKyc
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [remarks]
+              properties:
+                remarks:
+                  type: string
+                  minLength: 10
+                  maxLength: 500
+      responses:
+        "200":
+          description: Application rejected
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/banking/demo-accounts:
+    get:
+      tags: [Banking]
+      summary: List demo bank accounts for verification
+      operationId: getDemoBankAccounts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Seeded demo accounts
+
+  /api/banking/account:
+    get:
+      tags: [Banking]
+      summary: Get linked bank account and balance
+      operationId: getBankAccount
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Account details
+
+  /api/banking/accounts:
+    get:
+      tags: [Banking]
+      summary: List linked bank accounts
+      operationId: getLinkedAccounts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Linked accounts
+
+  /api/banking/verify-bank:
+    post:
+      tags: [Banking]
+      summary: Verify bank account (Rs. 2 debit simulation)
+      operationId: verifyBank
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyBankRequest"
+      responses:
+        "200":
+          description: Verification initiated or completed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/banking/beneficiary:
+    post:
+      tags: [Banking]
+      summary: Add transfer beneficiary
+      operationId: createBeneficiary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BeneficiaryRequest"
+      responses:
+        "201":
+          description: Beneficiary added
+
+  /api/banking/transfer:
+    post:
+      tags: [Banking]
+      summary: Transfer funds
+      operationId: transferFunds
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+      responses:
+        "200":
+          description: Transfer completed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/banking/transactions:
+    get:
+      tags: [Banking]
+      summary: Transaction history
+      operationId: getTransactions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Transaction list
+
+  /api/banking/lookup/{accountNumber}:
+    get:
+      tags: [Banking]
+      summary: Lookup bank account by number
+      operationId: lookupBankAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: accountNumber
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^\\d{12}$"
+      responses:
+        "200":
+          description: Account found
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/banking/admin/users:
+    get:
+      tags: [Banking]
+      summary: List banking users (admin)
+      operationId: getBankingAdminUsers
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User list with account status
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/banking/admin/transactions:
+    get:
+      tags: [Banking]
+      summary: All transactions (admin)
+      operationId: getBankingAdminTransactions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Transaction list
+
+  /api/banking/admin/users/{id}/freeze:
+    patch:
+      tags: [Banking]
+      summary: Freeze or unfreeze user account
+      operationId: freezeBankAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [frozen]
+              properties:
+                frozen:
+                  type: boolean
+      responses:
+        "200":
+          description: Account status updated
+
+  /api/banking/admin/users/{id}/reset-balance:
+    patch:
+      tags: [Banking]
+      summary: Reset user balance (admin demo)
+      operationId: resetBankBalance
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [balance]
+              properties:
+                balance:
+                  type: number
+                  minimum: 0
+      responses:
+        "200":
+          description: Balance reset
+
+  /api/investments/portfolio:
+    get:
+      tags: [Investments]
+      summary: Get portfolio holdings
+      operationId: getPortfolio
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Holdings list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  holdings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Holding"
+
+  /api/investments/buy:
+    post:
+      tags: [Investments]
+      summary: Buy stock or mutual fund
+      description: Requires approved KYC and verified bank account.
+      operationId: buyInvestment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuyRequest"
+      responses:
+        "201":
+          description: Order placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  holding:
+                    $ref: "#/components/schemas/Holding"
+        "403":
+          description: KYC not approved
+
+  /api/investments/sip:
+    post:
+      tags: [Investments]
+      summary: Create SIP
+      operationId: createSip
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SipRequest"
+      responses:
+        "201":
+          description: SIP created
+
+  /api/investments/admin/overview:
+    get:
+      tags: [Investments]
+      summary: AMC / admin AUM overview
+      operationId: getInvestmentAdminOverview
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: AUM summary and holdings
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/investments/admin/orders/{id}/status:
+    patch:
+      tags: [Investments]
+      summary: Update order status (AMC admin)
+      operationId: updateOrderStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - successful
+                    - rejected
+                    - pending_amc_approval
+                    - sip_active
+                    - sip_paused
+                    - sip_stopped
+      responses:
+        "200":
+          description: Order updated
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/notifications:
+    get:
+      tags: [Notifications]
+      summary: List notifications
+      description: Returns up to 50 most recent notifications.
+      operationId: listNotifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+
+  /api/notifications/unread-count:
+    get:
+      tags: [Notifications]
+      summary: Unread notification count
+      operationId: getUnreadCount
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+
+  /api/notifications/{id}/read:
+    put:
+      tags: [Notifications]
+      summary: Mark notification as read
+      operationId: markNotificationRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Notification updated
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/notifications/{id}:
+    delete:
+      tags: [Notifications]
+      summary: Delete notification
+      operationId: deleteNotification
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Notification removed
+
+  /api/audit/{resourceType}/{resourceId}:
+    get:
+      tags: [Audit]
+      summary: Get audit trail for a resource
+      operationId: getAuditTrail
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resourceType
+          in: path
+          required: true
+          schema:
+            type: string
+            example: kyc
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AuditEntry"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT from `POST /api/auth/verify-otp` (after signup), `POST /api/auth/signin`, or `POST /api/auth/admin/signin`.
+
+        In Scalar, click **Authorize** and enter: `Bearer <your-token>`
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Missing or invalid JWT
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Insufficient role
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: api-gateway
+        routes:
+          type: array
+          items:
+            type: object
+            properties:
+              prefix:
+                type: string
+              target:
+                type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          example: "+919876543210"
+        role:
+          type: string
+          enum: [user, admin, rta_admin, amc_admin]
+        phoneVerified:
+          type: boolean
+        emailVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    SignupPendingResponse:
+      type: object
+      required: [message, requiresPhoneVerification, registrationComplete, user]
+      properties:
+        message:
+          type: string
+          example: Account created. OTP sent to your phone for verification.
+        requiresPhoneVerification:
+          type: boolean
+          example: true
+        registrationComplete:
+          type: boolean
+          example: false
+        user:
+          $ref: "#/components/schemas/User"
+        otp:
+          type: object
+          properties:
+            provider:
+              type: string
+              example: development
+            devOtp:
+              type: string
+              description: Only returned in local development
+              example: "123456"
+
+    VerifyOtpResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        registrationComplete:
+          type: boolean
+          description: true when signup is finished and JWT is issued
+        approved:
+          type: boolean
+        provider:
+          type: string
+        status:
+          type: string
+        token:
+          type: string
+          description: Present when registrationComplete is true
+        user:
+          $ref: "#/components/schemas/User"
+
+    SendOtpResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        provider:
+          type: string
+        devOtp:
+          type: string
+          example: "123456"
+        sid:
+          type: string
+        status:
+          type: string
+        to:
+          type: string
+        channel:
+          type: string
+
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        provider:
+          type: string
+        devOtp:
+          type: string
+          description: Only when account exists in development
+          example: "123456"
+
+    SignupRequest:
+      type: object
+      required: [name, email, phone, password]
+      example:
+        name: Test User
+        email: newuser@finboard.local
+        phone: "+919900007777"
+        password: User@12345
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 80
+          example: Test User
+        email:
+          type: string
+          format: email
+          example: newuser@finboard.local
+        phone:
+          type: string
+          description: E.164 format, e.g. +919876543210
+          example: "+919900007777"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          example: User@12345
+
+    SigninRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AdminSigninRequest:
+      allOf:
+        - $ref: "#/components/schemas/SigninRequest"
+        - type: object
+          properties:
+            adminRole:
+              type: string
+              enum: [admin, rta_admin, amc_admin]
+
+    SendOtpRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+          description: E.164 format
+          example: "+919876543210"
+
+    VerifyOtpRequest:
+      type: object
+      required: [phone, otp]
+      example:
+        phone: "+919900007777"
+        otp: "123456"
+      properties:
+        phone:
+          type: string
+          description: E.164 format
+          example: "+919900007777"
+        otp:
+          type: string
+          pattern: "^\\d{4,8}$"
+          example: "123456"
+
+    ChangePasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
+          maxLength: 72
+
+    ResetPasswordRequest:
+      type: object
+      required: [email, otp, newPassword]
+      properties:
+        email:
+          type: string
+          format: email
+        otp:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
+
+    Profile:
+      type: object
+      properties:
+        userId:
+          type: string
+        fullName:
+          type: string
+        kycStatus:
+          type: string
+        pan:
+          type: string
+        mobileNumber:
+          type: string
+        emailAddress:
+          type: string
+        address:
+          type: object
+
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+        dateOfBirth:
+          type: string
+        pan:
+          type: string
+        mobileNumber:
+          type: string
+        emailAddress:
+          type: string
+        maritalStatus:
+          type: string
+          enum: ["", Single, Married, Other]
+        gender:
+          type: string
+        incomeRange:
+          type: string
+        occupation:
+          type: string
+        address:
+          type: object
+          properties:
+            line1:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            postalCode:
+              type: string
+            country:
+              type: string
+
+    KycApplication:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        panNumber:
+          type: string
+        aadhaarNumber:
+          type: string
+        status:
+          type: string
+          enum:
+            - draft
+            - pending_admin_review
+            - approved
+            - rejected
+            - failed
+        adminRemarks:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    VerifyBankRequest:
+      type: object
+      required: [accountNumber, ifsc, accountHolderName]
+      properties:
+        accountNumber:
+          type: string
+          pattern: "^\\d{12}$"
+        ifsc:
+          type: string
+          example: HDFC0001234
+        accountHolderName:
+          type: string
+
+    BeneficiaryRequest:
+      type: object
+      required: [accountNumber, ifsc]
+      properties:
+        accountNumber:
+          type: string
+        ifsc:
+          type: string
+
+    TransferRequest:
+      type: object
+      required: [accountNumber, ifsc, amount]
+      properties:
+        accountNumber:
+          type: string
+        ifsc:
+          type: string
+        amount:
+          type: number
+          exclusiveMinimum: 0
+        remarks:
+          type: string
+          maxLength: 120
+
+    BuyRequest:
+      type: object
+      required: [symbol, name, price, quantity]
+      properties:
+        symbol:
+          type: string
+          example: RELIANCE
+        name:
+          type: string
+        price:
+          type: number
+          exclusiveMinimum: 0
+        quantity:
+          type: number
+          exclusiveMinimum: 0
+        assetType:
+          type: string
+          enum: [stock, mutual_fund]
+          default: stock
+
+    SipRequest:
+      type: object
+      required: [symbol, name, nav, monthlyAmount, sipDate]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        nav:
+          type: number
+          exclusiveMinimum: 0
+        monthlyAmount:
+          type: number
+          minimum: 100
+        sipDate:
+          type: integer
+          minimum: 1
+          maximum: 28
+
+    Holding:
+      type: object
+      properties:
+        _id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        assetType:
+          type: string
+        quantity:
+          type: number
+        purchasePrice:
+          type: number
+        orderStatus:
+          type: string
+
+    Notification:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AuditEntry:
+      type: object
+      properties:
+        action:
+          type: string
+        actorId:
+          type: string
+        resourceType:
+          type: string
+        resourceId:
+          type: string
+        metadata:
+          type: object
+        createdAt:
+          type: string
+          format: date-time

@@ -45,11 +45,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    firebaseUid: {
-      type: String,
-      sparse: true,
-      index: true
-    },
     lastLoginAt: Date
   },
   { timestamps: true }

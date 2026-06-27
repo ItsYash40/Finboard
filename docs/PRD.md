@@ -308,7 +308,6 @@ All financial flows are simulated. No real money movement occurs outside the dum
   "role": "enum: user | admin | rta_admin | amc_admin",
   "phoneVerified": "boolean",
   "emailVerified": "boolean",
-  "firebaseUid": "string (optional)",
   "lastLoginAt": "ISODate",
   "createdAt": "ISODate",
   "updatedAt": "ISODate"
@@ -588,7 +587,7 @@ See `TECH-STACK.md` for full detail. Highlights:
 | File storage | Local disk (interim) | AWS S3 / MinIO |
 | Messaging | In-process calls | Apache Kafka (kafkajs) |
 | OCR | Tesseract.js + OpenRouter | Tesseract.js (+ optional LLM) |
-| OTP | Twilio-compatible + dev fallback | Twilio / Firebase (optional) |
+| OTP | Twilio-compatible + dev fallback | Twilio / dev OTP |
 | Packaging | pnpm workspace | Docker + Docker Compose |
 
 ---
@@ -604,7 +603,7 @@ KYC_ONBOARDING-Page/
 │   └── src/
 │       ├── auth/                  # Admin seed scripts
 │       ├── banking/               # Banking module (Prisma)
-│       ├── config/                # env, db, firebase
+│       ├── config/                # env, db
 │       ├── controllers/           # Auth, profile controllers
 │       ├── investments/           # Investment routes + logic
 │       ├── kyc/                   # KYC, OCR, notifications, audit helpers
@@ -624,7 +623,7 @@ KYC_ONBOARDING-Page/
 │       │   └── admin/             # dashboard, kyc, amc
 │       ├── components/ui/         # shadcn/ui
 │       ├── features/              # auth, banking, dashboard, investments, kyc, admin, layout, notifications, profile
-│       ├── lib/                   # api client, utils, firebase, supabase stubs
+│       ├── lib/                   # api client, utils, supabase stubs
 │       ├── providers/             # app providers (Query, Theme, Auth)
 │       └── hooks/
 ├── DOCS/                          # Planning doc copies
@@ -731,7 +730,7 @@ services:
 - SIP auto-debit scheduling (cron + Kafka)
 - WhatsApp / Telegram notification channels
 - Kubernetes deployment with Helm charts
-- Firebase phone auth integration (client stubs exist)
+- Phone OTP via Twilio with local dev fallback
 - Full audit and notification Kafka pipeline
 
 ---

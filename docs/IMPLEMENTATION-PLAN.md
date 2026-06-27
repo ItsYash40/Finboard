@@ -101,7 +101,7 @@ packages/validation        → Zod helpers
 | 1.8 | PATCH `/api/auth/change-password` | ✅ |
 | 1.9 | Internal routes for inter-service user lookups | ✅ |
 | 1.10 | Admin seed script | ✅ |
-| 1.11 | Firebase phone auth integration | ✅ |
+| 1.11 | Phone OTP via Twilio + dev fallback | ✅ |
 | 1.12 | Password reset via email OTP — `POST /forgot-password` + `POST /reset-password` (nodemailer/dev fallback) | ✅ |
 | 1.13 | Jest tests — 28 tests, 100% pass: signup, signin, admin, OTP, change-password, forgot/reset-password | ✅ |
 

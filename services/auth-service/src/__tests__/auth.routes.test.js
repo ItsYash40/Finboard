@@ -117,33 +117,40 @@ describe("POST /api/auth/verify-otp", () => {
 // ── POST /api/auth/signup ─────────────────────────────────────────────────────
 
 describe("POST /api/auth/signup", () => {
-  it("creates a user and returns token", async () => {
-    await request(app).post("/api/auth/send-otp").send({ phone: TEST_PHONE });
-
+  it("creates a pending user, sends OTP, and completes on verify-otp", async () => {
     const res = await request(app).post("/api/auth/signup").send({
       name: "New User",
       email: TEST_EMAIL,
       phone: TEST_PHONE,
-      password: TEST_PASSWORD,
-      otp: DEV_OTP
+      password: TEST_PASSWORD
     });
 
     expect(res.status).toBe(201);
-    expect(res.body.token).toBeTruthy();
+    expect(res.body.requiresPhoneVerification).toBe(true);
+    expect(res.body.registrationComplete).toBe(false);
+    expect(res.body.token).toBeUndefined();
     expect(res.body.user.email).toBe(TEST_EMAIL);
-    expect(res.body.user.role).toBe("user");
+    expect(res.body.user.phoneVerified).toBe(false);
+    expect(res.body.otp.devOtp).toBe(DEV_OTP);
+
+    const verifyRes = await request(app)
+      .post("/api/auth/verify-otp")
+      .send({ phone: TEST_PHONE, otp: DEV_OTP });
+
+    expect(verifyRes.status).toBe(200);
+    expect(verifyRes.body.registrationComplete).toBe(true);
+    expect(verifyRes.body.token).toBeTruthy();
+    expect(verifyRes.body.user.phoneVerified).toBe(true);
   });
 
   it("returns 409 on duplicate email", async () => {
     await createUser();
-    await request(app).post("/api/auth/send-otp").send({ phone: "+919876543211" });
 
     const res = await request(app).post("/api/auth/signup").send({
       name: "Dup User",
       email: TEST_EMAIL,
       phone: "+919876543211",
-      password: TEST_PASSWORD,
-      otp: DEV_OTP
+      password: TEST_PASSWORD
     });
 
     expect(res.status).toBe(409);
@@ -151,28 +158,30 @@ describe("POST /api/auth/signup", () => {
 
   it("returns 409 on duplicate phone", async () => {
     await createUser();
-    await request(app).post("/api/auth/send-otp").send({ phone: TEST_PHONE });
 
     const res = await request(app).post("/api/auth/signup").send({
       name: "Dup User",
       email: "other@test.com",
       phone: TEST_PHONE,
-      password: TEST_PASSWORD,
-      otp: DEV_OTP
+      password: TEST_PASSWORD
     });
 
     expect(res.status).toBe(409);
   });
 
-  it("returns 400 when no OTP or firebaseIdToken provided", async () => {
-    const res = await request(app).post("/api/auth/signup").send({
-      name: "No OTP",
-      email: TEST_EMAIL,
-      phone: TEST_PHONE,
+  it("blocks signin until phone is verified", async () => {
+    await request(app).post("/api/auth/signup").send({
+      name: "Pending User",
+      email: "pending@test.com",
+      phone: "+919000000099",
       password: TEST_PASSWORD
     });
 
-    expect(res.status).toBe(400);
+    const res = await request(app)
+      .post("/api/auth/signin")
+      .send({ email: "pending@test.com", password: TEST_PASSWORD });
+
+    expect(res.status).toBe(403);
   });
 });
 

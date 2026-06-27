@@ -404,7 +404,7 @@ Extract modules from `backend/src/{domain}/` into `services/{domain}-service/` o
 | `src/schemas/` | Zod validation | `authSchemas.js`, `profileSchemas.js` | validate middleware |
 | `src/services/` | Shared services | `otpService.js` | auth controller |
 | `src/utils/` | Helpers | `jwt.js` | auth |
-| `src/config/` | Environment | `env.js`, `db.js`, `firebase.js` | startup |
+| `src/config/` | Environment | `env.js`, `db.js` | startup |
 | `src/auth/` | Admin seed | `seedAdminUser.js` | CLI seed |
 | `src/kyc/` | KYC domain | controllers, routes, services, middleware, schemas | MongoDB, uploads, audit, notifications |
 | `src/banking/` | Banking domain | routes, controllers, services, prisma, jobs | PostgreSQL |
@@ -691,7 +691,7 @@ If an admin-role user lands on `/dashboard`, redirect to appropriate admin home.
 |------------|--------|
 | **No refresh tokens** | Single JWT until expiry; user must re-login |
 | **No HttpOnly cookies** | Token in `localStorage` — XSS-readable |
-| **No Firebase authentication** | `lib/firebase.js` exists but is **not wired** into auth flow |
+| **Phone OTP authentication** | Twilio + dev fallback (`TWILIO_DEV_OTP`) |
 | **No email password reset** | Only `change-password` while authenticated |
 | **JWT in localStorage** | Client-side persistence; not secure against XSS |
 | **OTP store in-memory** | Dev OTP lost on server restart (Twilio paths unaffected) |
@@ -1768,7 +1768,7 @@ Each `backend/src/{domain}/` folder is designed as an **extraction boundary**. P
 | Admin KYC | No server pagination/filter |
 | Investments | Market prices partly mocked client-side |
 | Infrastructure | No Docker, Kafka, tests in repo |
-| Firebase/Supabase | Client libs present but unused |
+| Supabase | Client lib present but unused |
 
 ## 20.7 Future Enhancements
 
