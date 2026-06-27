@@ -1005,6 +1005,16 @@ Banking routes use:
 
 1. `requireAuth`
 2. `requireBankingConfigured` — returns error if `BANK_DATABASE_URL` not set
+3. **Role enforcement** via `requireRole`:
+   - **Customer routes** (`/api/banking/*`, excluding `/admin/*`): `requireRole("user")` — retail investors only
+   - **Admin routes** (`/api/banking/admin/*`): `requireRole("admin")` — KYC Review Admin and Operations Admin only
+
+| Persona | JWT `role` | Customer banking | Banking admin |
+|---------|------------|------------------|---------------|
+| Retail investor | `user` | Yes | No |
+| KYC / Operations Admin | `admin` | No | Yes |
+| RTA Admin | `rta_admin` | No | No |
+| AMC Manager | `amc_admin` | No | No |
 
 If banking is not configured, `/api/banking/*` fails gracefully; rest of app works.
 
@@ -1100,7 +1110,9 @@ sequenceDiagram
 Route: `/banking` → `features/banking/screens/banking-screen.jsx`  
 API module: `features/banking/api/banking-api.js`
 
-Admin banking: `/banking/admin` (requires admin role on frontend + backend).
+Admin banking: `/banking/admin` (requires `admin` JWT role on frontend + backend).
+
+Customer banking: `/banking` (requires `user` JWT role — admins are redirected away).
 
 ---
 

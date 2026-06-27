@@ -3,7 +3,7 @@ import { BankingScreen } from "@/features/banking";
 
 export default function BankingPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole={["user"]}>
       <BankingScreen />
     </ProtectedRoute>
   );

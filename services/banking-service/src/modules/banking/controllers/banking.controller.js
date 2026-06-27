@@ -4,7 +4,7 @@ import {
   listAdminTransactions,
   listAdminUsers,
   listLinkedAccounts,
-  listSeededAccounts,
+  listSeededAccountsForUser,
   listTransactions,
   lookupAccount,
   resetAccountBalance,
@@ -28,7 +28,7 @@ function getAppUser(req) {
 
 export async function getDemoAccounts(req, res, next) {
   try {
-    res.json({ accounts: await listSeededAccounts() });
+    res.json({ accounts: await listSeededAccountsForUser(getAppUser(req)) });
   } catch (error) {
     next(error);
   }

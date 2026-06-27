@@ -83,6 +83,22 @@ info:
     **RTA:** rta.admin@finboard.local / RtaAdmin@12345
 
     Full list: AUTH_CREDENTIALS.md
+
+    ---
+
+    ## Role access matrix (Banking)
+
+    Banking APIs are split into **customer** (`/api/banking/*`) and **admin** (`/api/banking/admin/*`) route groups. Each route enforces JWT role via `requireRole`.
+
+    | Persona | Email | JWT `role` | Customer banking | Banking admin |
+    |---------|-------|------------|------------------|---------------|
+    | Retail investor | user@finboard.local, anurag@finboard.local, etc. | `user` | Yes | No |
+    | KYC Review Admin | admin@finboard.local | `admin` | No | Yes |
+    | Operations Admin | ops.admin@finboard.local | `admin` | No | Yes |
+    | RTA Records Admin | rta.admin@finboard.local | `rta_admin` | No | No |
+    | AMC Manager | amc.admin@finboard.local | `amc_admin` | No | No |
+
+    **Denied roles:** Customer routes return **403** for `admin`, `rta_admin`, and `amc_admin`. Admin routes return **403** for `user`, `rta_admin`, and `amc_admin`.
   contact:
     name: Finboard
   license:
@@ -113,7 +129,14 @@ tags:
   - name: KYC
     description: KYC submission and admin review
   - name: Banking
-    description: Bank verification, transfers, admin banking
+    description: |
+      Dummy core banking — account linking, verification (Rs. 2 debit), transfers, beneficiaries, and admin ops.
+
+      **Customer routes** (`/api/banking/*`, except `/admin/*`): JWT role `user` only (retail investors).
+
+      **Admin routes** (`/api/banking/admin/*`): JWT role `admin` only (KYC Review Admin, Operations Admin).
+
+      See **Role access matrix (Banking)** in the API description for persona → role mapping.
   - name: Investments
     description: Portfolio, orders, SIP, AMC admin
   - name: Notifications
@@ -807,41 +830,134 @@ paths:
   /api/banking/demo-accounts:
     get:
       tags: [Banking]
-      summary: List demo bank accounts for verification
+      summary: List demo bank account for the authenticated user
+      description: |
+        Returns the demo bank account(s) that belong to the signed-in retail investor only.
+
+        Matching order: linked `appUserId` first, then bank account `email`, `phone`, or `holderName`
+        from the JWT user profile.
+
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor (e.g. user@finboard.local, anurag@finboard.local)
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: getDemoBankAccounts
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: Seeded demo accounts
+          description: Demo account(s) for the authenticated user only
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/account:
     get:
       tags: [Banking]
       summary: Get linked bank account and balance
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: getBankAccount
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       responses:
         "200":
           description: Account details
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/accounts:
     get:
       tags: [Banking]
       summary: List linked bank accounts
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: getLinkedAccounts
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       responses:
         "200":
           description: Linked accounts
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/banking/balance:
+    get:
+      tags: [Banking]
+      summary: Get linked bank account balance
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
+      operationId: getBankBalance
+      x-required-roles: [user]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Account balance and summary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/banking/accounts/{id}:
+    delete:
+      tags: [Banking]
+      summary: Remove a linked bank account
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
+      operationId: removeLinkedBankAccount
+      x-required-roles: [user]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Account unlinked
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/banking/verify-bank:
     post:
       tags: [Banking]
       summary: Verify bank account (Rs. 2 debit simulation)
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: verifyBank
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       requestBody:
@@ -855,12 +971,23 @@ paths:
           description: Verification initiated or completed
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/beneficiary:
     post:
       tags: [Banking]
       summary: Add transfer beneficiary
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: createBeneficiary
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       requestBody:
@@ -872,12 +999,23 @@ paths:
       responses:
         "201":
           description: Beneficiary added
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/transfer:
     post:
       tags: [Banking]
       summary: Transfer funds
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: transferFunds
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       requestBody:
@@ -891,23 +1029,93 @@ paths:
           description: Transfer completed
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/transactions:
     get:
       tags: [Banking]
       summary: Transaction history
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: getTransactions
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       responses:
         "200":
           description: Transaction list
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/banking/notifications:
+    get:
+      tags: [Banking]
+      summary: List banking notifications
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
+      operationId: getBankingNotifications
+      x-required-roles: [user]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Banking notification list
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/banking/notifications/{id}:
+    delete:
+      tags: [Banking]
+      summary: Delete a banking notification
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
+      operationId: deleteBankingNotification
+      x-required-roles: [user]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Notification deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/banking/lookup/{accountNumber}:
     get:
       tags: [Banking]
       summary: Lookup bank account by number
+      description: |
+        **Required JWT role(s):** `user`
+
+        **Allowed personas:** Retail investor only
+
+        **Denied:** `admin`, `rta_admin`, `amc_admin` → 403
       operationId: lookupBankAccount
+      x-required-roles: [user]
       security:
         - bearerAuth: []
       parameters:
@@ -920,6 +1128,10 @@ paths:
       responses:
         "200":
           description: Account found
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -927,12 +1139,21 @@ paths:
     get:
       tags: [Banking]
       summary: List banking users (admin)
+      description: |
+        **Required JWT role(s):** `admin`
+
+        **Allowed personas:** KYC Review Admin (admin@finboard.local), Operations Admin (ops.admin@finboard.local)
+
+        **Denied:** `user`, `rta_admin`, `amc_admin` → 403
       operationId: getBankingAdminUsers
+      x-required-roles: [admin]
       security:
         - bearerAuth: []
       responses:
         "200":
           description: User list with account status
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
 
@@ -940,18 +1161,36 @@ paths:
     get:
       tags: [Banking]
       summary: All transactions (admin)
+      description: |
+        **Required JWT role(s):** `admin`
+
+        **Allowed personas:** KYC Review Admin, Operations Admin
+
+        **Denied:** `user`, `rta_admin`, `amc_admin` → 403
       operationId: getBankingAdminTransactions
+      x-required-roles: [admin]
       security:
         - bearerAuth: []
       responses:
         "200":
           description: Transaction list
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/admin/users/{id}/freeze:
     patch:
       tags: [Banking]
       summary: Freeze or unfreeze user account
+      description: |
+        **Required JWT role(s):** `admin`
+
+        **Allowed personas:** KYC Review Admin, Operations Admin
+
+        **Denied:** `user`, `rta_admin`, `amc_admin` → 403
       operationId: freezeBankAccount
+      x-required-roles: [admin]
       security:
         - bearerAuth: []
       parameters:
@@ -969,12 +1208,23 @@ paths:
       responses:
         "200":
           description: Account status updated
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/banking/admin/users/{id}/reset-balance:
     patch:
       tags: [Banking]
       summary: Reset user balance (admin demo)
+      description: |
+        **Required JWT role(s):** `admin`
+
+        **Allowed personas:** KYC Review Admin, Operations Admin
+
+        **Denied:** `user`, `rta_admin`, `amc_admin` → 403
       operationId: resetBankBalance
+      x-required-roles: [admin]
       security:
         - bearerAuth: []
       parameters:
@@ -993,6 +1243,10 @@ paths:
       responses:
         "200":
           description: Balance reset
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /api/investments/portfolio:
     get:
@@ -1205,6 +1459,14 @@ paths:
           $ref: "#/components/responses/Forbidden"
 
 components:
+  x-finboard-role-notes:
+    bankingCustomer:
+      roles: [user]
+      personas: [Retail investor]
+    bankingAdmin:
+      roles: [admin]
+      personas: [KYC Review Admin, Operations Admin]
+
   securitySchemes:
     bearerAuth:
       type: http

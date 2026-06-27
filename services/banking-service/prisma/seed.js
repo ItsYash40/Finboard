@@ -29,7 +29,8 @@ const accounts = [
   ["Kabir Khan", "kabir.khan@testbank.local", "+919000000008", "100000000008", 40000, "KK"],
   ["Meera Iyer", "meera.iyer@testbank.local", "+919000000009", "100000000009", 7600, "MI"],
   ["Rohan Verma", "rohan.verma@testbank.local", "+919000000010", "100000000010", 25800, "RV"],
-  ["Isha Nair", "isha.nair@testbank.local", "+919000000011", "100000000011", 11000, "IN"]
+  ["Isha Nair", "isha.nair@testbank.local", "+919000000011", "100000000011", 11000, "IN"],
+  ["Anurag Swarnakar", "anurag@finboard.local", "+919348404335", "100000000012", 20000, "AS"],
 ].map((account) =>
   Array.isArray(account)
     ? {

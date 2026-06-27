@@ -43,16 +43,47 @@ import { createJwtUtils } from "@finboard/shared";
 
 // ── Register local auth handler so requireAuth doesn't call auth-service HTTP ─
 registerLocalAuthHandler({
-  getUserById: async (userId) => ({
-    _id: userId,
-    id: userId,
-    name: "Test User",
-    email: `${userId}@test.local`,
-    phone: "+919000000099",
-    role: userId.startsWith("admin") ? "admin" : "user",
-    phoneVerified: true,
-    emailVerified: false
-  })
+  getUserById: async (userId) => {
+    const usersById = {
+      "admin-user-id-001": {
+        name: "Admin User",
+        email: "admin@finboard.local",
+        phone: "+910000000001",
+        role: "admin"
+      },
+      "rta-user-id-001": {
+        name: "RTA Admin",
+        email: "rta.admin@finboard.local",
+        phone: "+910000000003",
+        role: "rta_admin"
+      },
+      "amc-user-id-001": {
+        name: "AMC Admin",
+        email: "amc.admin@finboard.local",
+        phone: "+910000000004",
+        role: "amc_admin"
+      },
+      "rahul-user-id-001": {
+        name: "Rahul Sharma",
+        email: "user@finboard.local",
+        phone: "+919876543210",
+        role: "user"
+      }
+    };
+
+    const known = usersById[userId];
+
+    return {
+      _id: userId,
+      id: userId,
+      name: known?.name || "Test User",
+      email: known?.email || `${userId}@test.local`,
+      phone: known?.phone || "+919000000099",
+      role: known?.role || (userId.startsWith("admin") ? "admin" : "user"),
+      phoneVerified: true,
+      emailVerified: false
+    };
+  }
 });
 
 // ── JWT helper (uses @finboard/shared utilities) ──────────────────────────────
@@ -76,6 +107,14 @@ function bearerToken(overrides = {}) {
 
 function adminToken() {
   return bearerToken({ role: "admin", _id: "admin-user-id-001", email: "admin@finboard.local" });
+}
+
+function rtaToken() {
+  return bearerToken({ role: "rta_admin", _id: "rta-user-id-001", email: "rta.admin@finboard.local" });
+}
+
+function amcToken() {
+  return bearerToken({ role: "amc_admin", _id: "amc-user-id-001", email: "amc.admin@finboard.local" });
 }
 
 // ── App instance ──────────────────────────────────────────────────────────────
@@ -500,6 +539,66 @@ describe("4.6 — GET account / balance / transactions", () => {
     expect(res.body.transactions[0].type).toBe("DEBIT");
   });
 
+  it("GET /api/banking/transactions excludes receiver credit leg when user sent money", async () => {
+    const sender = await seedTestAccount({
+      email: "txn.sender@test.local",
+      accountNumber: "400000000030",
+      appUserId: "user-txn-sender-001"
+    });
+    const receiver = await seedTestAccount({
+      email: "txn.receiver@test.local",
+      accountNumber: "400000000031",
+      appUserId: "user-txn-receiver-001"
+    });
+
+    const debit = await testPrisma.bankTransaction.create({
+      data: {
+        transactionRef: generateTransactionRef("DBT"),
+        senderId: sender.id,
+        receiverId: receiver.id,
+        senderAccountNumber: sender.accountNumber,
+        receiverAccountNumber: receiver.accountNumber,
+        amount: toDecimal(500),
+        type: "DEBIT",
+        status: "SUCCESS",
+        description: "Payment sent",
+        appUserId: "user-txn-sender-001"
+      }
+    });
+
+    await testPrisma.bankTransaction.create({
+      data: {
+        transactionRef: generateTransactionRef("CDT"),
+        senderId: sender.id,
+        receiverId: receiver.id,
+        senderAccountNumber: sender.accountNumber,
+        receiverAccountNumber: receiver.accountNumber,
+        amount: toDecimal(500),
+        type: "CREDIT",
+        status: "SUCCESS",
+        description: "Money Received",
+        appUserId: "user-txn-receiver-001"
+      }
+    });
+
+    const senderRes = await request(app)
+      .get("/api/banking/transactions")
+      .set("Authorization", bearerToken({ _id: "user-txn-sender-001" }));
+
+    expect(senderRes.status).toBe(200);
+    expect(senderRes.body.transactions).toHaveLength(1);
+    expect(senderRes.body.transactions[0].id).toBe(debit.id);
+    expect(senderRes.body.transactions[0].type).toBe("DEBIT");
+
+    const receiverRes = await request(app)
+      .get("/api/banking/transactions")
+      .set("Authorization", bearerToken({ _id: "user-txn-receiver-001" }));
+
+    expect(receiverRes.status).toBe(200);
+    expect(receiverRes.body.transactions).toHaveLength(1);
+    expect(receiverRes.body.transactions[0].type).toBe("CREDIT");
+  });
+
   it("GET /api/banking/transactions returns empty array for unlinked user", async () => {
     const res = await request(app)
       .get("/api/banking/transactions")
@@ -509,16 +608,63 @@ describe("4.6 — GET account / balance / transactions", () => {
     expect(res.body.transactions).toHaveLength(0);
   });
 
-  it("GET /api/banking/demo-accounts returns list of customer accounts", async () => {
-    await seedTestAccount({ email: "demo1@test.local", accountNumber: "400000000010", role: "CUSTOMER" });
-    await seedTestAccount({ email: "demo2@test.local", accountNumber: "400000000011", role: "CUSTOMER" });
+  it("GET /api/banking/demo-accounts returns only the authenticated user's demo account", async () => {
+    await seedTestAccount({
+      email: "test-user-id-001@test.local",
+      holderName: "Test User",
+      accountNumber: "400000000010",
+      role: "CUSTOMER"
+    });
+    await seedTestAccount({
+      email: "other@test.local",
+      holderName: "Other Person",
+      accountNumber: "400000000011",
+      role: "CUSTOMER"
+    });
 
     const res = await request(app)
       .get("/api/banking/demo-accounts")
       .set("Authorization", bearerToken());
 
     expect(res.status).toBe(200);
-    expect(res.body.accounts.length).toBeGreaterThanOrEqual(2);
+    expect(res.body.accounts).toHaveLength(1);
+    expect(res.body.accounts[0].accountNumber).toBe("400000000010");
+  });
+
+  it("GET /api/banking/demo-accounts matches demo account by holder name when email differs", async () => {
+    await seedTestAccount({
+      email: "rahul.sharma@testbank.local",
+      holderName: "Rahul Sharma",
+      phone: "+919000000002",
+      accountNumber: "400000000020",
+      role: "CUSTOMER"
+    });
+    await seedTestAccount({
+      email: "priya.singh@testbank.local",
+      holderName: "Priya Singh",
+      accountNumber: "400000000021",
+      role: "CUSTOMER"
+    });
+
+    const res = await request(app)
+      .get("/api/banking/demo-accounts")
+      .set("Authorization", bearerToken({ _id: "rahul-user-id-001" }));
+
+    expect(res.status).toBe(200);
+    expect(res.body.accounts).toHaveLength(1);
+    expect(res.body.accounts[0].holderName).toBe("Rahul Sharma");
+  });
+
+  it("GET /api/banking/demo-accounts returns 403 for admin role", async () => {
+    const res = await request(app).get("/api/banking/demo-accounts").set("Authorization", adminToken());
+
+    expect(res.status).toBe(403);
+  });
+
+  it("GET /api/banking/demo-accounts returns 403 for rta_admin role", async () => {
+    const res = await request(app).get("/api/banking/demo-accounts").set("Authorization", rtaToken());
+
+    expect(res.status).toBe(403);
   });
 
   it("GET /api/banking/lookup/:accountNumber returns account info", async () => {
@@ -833,6 +979,18 @@ describe("4.9 — Admin endpoints (freeze, reset balance, list users/transaction
     const res = await request(app)
       .get("/api/banking/admin/users")
       .set("Authorization", bearerToken({ role: "user" }));
+
+    expect(res.status).toBe(403);
+  });
+
+  it("GET /api/banking/admin/users returns 403 for rta_admin role", async () => {
+    const res = await request(app).get("/api/banking/admin/users").set("Authorization", rtaToken());
+
+    expect(res.status).toBe(403);
+  });
+
+  it("GET /api/banking/admin/users returns 403 for amc_admin role", async () => {
+    const res = await request(app).get("/api/banking/admin/users").set("Authorization", amcToken());
 
     expect(res.status).toBe(403);
   });
