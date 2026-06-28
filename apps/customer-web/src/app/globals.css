@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "react-phone-number-input/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -355,4 +356,15 @@
   --fb-body: #a0a39e;
   --fb-mute: #686a67;
   --fb-positive-deep: #86efac;
+}
+
+.PhoneInput {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
 }

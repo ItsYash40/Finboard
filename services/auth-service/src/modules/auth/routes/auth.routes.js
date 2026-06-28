@@ -3,7 +3,7 @@ import {
   signup,
   signin,
   adminSignin,
-  phoneLogin,
+  emailLogin,
   me,
   changePassword,
   sendOtp,
@@ -16,8 +16,8 @@ import { validate } from "@finboard/shared";
 import {
   adminSigninSchema,
   changePasswordSchema,
+  emailLoginSchema,
   forgotPasswordSchema,
-  phoneLoginSchema,
   resetPasswordSchema,
   sendOtpSchema,
   signinSchema,
@@ -32,7 +32,7 @@ authRouter.post("/signin", validate(signinSchema), signin);
 authRouter.post("/admin/signin", validate(adminSigninSchema), adminSignin);
 authRouter.post("/send-otp", validate(sendOtpSchema), sendOtp);
 authRouter.post("/verify-otp", validate(verifyOtpSchema), verifyOtp);
-authRouter.post("/phone-login", validate(phoneLoginSchema), phoneLogin);
+authRouter.post("/email-login", validate(emailLoginSchema), emailLogin);
 authRouter.get("/me", requireAuth, me);
 authRouter.patch("/change-password", requireAuth, validate(changePasswordSchema), changePassword);
 authRouter.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword);

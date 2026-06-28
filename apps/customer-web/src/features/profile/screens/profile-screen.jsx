@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ThemeSelector } from "@/components/theme-selector";
+import PhoneInput from "@/components/phone-input";
 import { api, getApiError } from "@/lib/api";
 import { formatDate, maskEmail, maskPan, maskPhone } from "@/lib/format";
 import { useAuth } from "../../auth/context/auth-context";
@@ -265,7 +266,11 @@ export default function ProfilePage() {
                       </Field>
                       <Field className="gap-1.5">
                         <FieldLabel>Mobile number</FieldLabel>
-                        <Input value={profile.mobileNumber || ""} onChange={(event) => updateField("mobileNumber", event.target.value)} />
+                        <PhoneInput
+                          id="mobileNumber"
+                          value={profile.mobileNumber || ""}
+                          onChange={(value) => updateField("mobileNumber", value)}
+                        />
                       </Field>
                       <Field className="gap-1.5 sm:col-span-2">
                         <FieldLabel>Email</FieldLabel>

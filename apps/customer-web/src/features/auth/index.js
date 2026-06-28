@@ -1,8 +1,11 @@
 export { default as SignupScreen } from "./screens/signup-screen";
 export { default as SigninScreen } from "./screens/signin-screen";
-export { getAuthErrorMessage, isPendingVerificationConflict } from "./lib/auth-errors";
+export { getAuthErrorMessage, isAlreadyRegisteredConflict } from "./lib/auth-errors";
 export { default as AdminLoginScreen } from "./screens/admin-login-screen";
 export { default as AuthShell } from "./components/auth-shell";
 export { default as ProtectedRoute } from "./components/protected-route";
+export { default as GuestRoute } from "./components/guest-route";
 export { default as DashboardGate } from "./components/dashboard-gate";
+export { getAuthenticatedHomeRoute } from "./lib/post-auth-route";
+export { isAdminRole, isCustomerRole, ADMIN_ROLES } from "./lib/roles";
 export { AuthProvider, useAuth } from "./context/auth-context";

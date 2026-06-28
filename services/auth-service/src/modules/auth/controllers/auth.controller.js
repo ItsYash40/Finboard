@@ -1,24 +1,27 @@
 import { User } from "../models/user.model.js";
 import { createInitialProfile } from "@finboard/contracts";
-import { sendPhoneOtp, verifyPhoneOtp, verifyPhoneOtpDetailed } from "../services/otp.service.js";
+import { sendEmailOtp, verifyEmailOtp, verifyEmailOtpDetailed } from "../services/otp.service.js";
 import { sendPasswordResetOtp, verifyPasswordResetOtp } from "../services/email.service.js";
 import { signJwt } from "../../../common/helpers/jwt.helper.js";
+import { isAdminRole } from "../helpers/roles.helper.js";
+
+function normalizeEmail(email) {
+  return String(email).trim().toLowerCase();
+}
 
 export async function sendOtp(req, res, next) {
   try {
-    const phone = req.body.phone;
-    const user = await User.findOne({ phone });
+    const email = normalizeEmail(req.body.email);
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: "No account registered with this phone number" });
+      return res.status(404).json({ message: "No account registered with this email address" });
     }
 
-    const result = await sendPhoneOtp(phone);
+    const result = await sendEmailOtp(email, { name: user.name });
     return res.json({
-      message: "OTP sent successfully",
+      message: "OTP sent successfully to your email",
       provider: result.provider,
-      sid: result.sid,
-      status: result.status,
       to: result.to,
       channel: result.channel
     });
@@ -29,7 +32,8 @@ export async function sendOtp(req, res, next) {
 
 export async function verifyOtp(req, res, next) {
   try {
-    const result = await verifyPhoneOtpDetailed(req.body.phone, req.body.otp);
+    const email = normalizeEmail(req.body.email);
+    const result = await verifyEmailOtpDetailed(email, req.body.otp);
 
     if (!result.approved) {
       return res.json({
@@ -39,10 +43,10 @@ export async function verifyOtp(req, res, next) {
       });
     }
 
-    const pendingUser = await User.findOne({ phone: req.body.phone, phoneVerified: false });
+    const pendingUser = await User.findOne({ email, emailVerified: false });
 
     if (pendingUser) {
-      pendingUser.phoneVerified = true;
+      pendingUser.emailVerified = true;
       pendingUser.lastLoginAt = new Date();
       await pendingUser.save();
 
@@ -75,31 +79,66 @@ export async function verifyOtp(req, res, next) {
 export async function signup(req, res, next) {
   try {
     const { name, email, phone, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    const existing = await User.findOne({ $or: [{ email }, { phone }] });
+    const byEmail = await User.findOne({ email: normalizedEmail });
+    const byPhone = await User.findOne({ phone });
+
+    if (byEmail && byPhone && byEmail._id.toString() !== byPhone._id.toString()) {
+      return res.status(409).json({
+        message: "This email and phone number belong to different pending signups. Use matching details or different credentials."
+      });
+    }
+
+    const existing = byEmail || byPhone;
+
     if (existing) {
-      if (!existing.phoneVerified) {
+      if (existing.emailVerified) {
         return res.status(409).json({
-          message: "An account with this email or phone is pending verification. Verify OTP or use a different email/phone."
+          message: "An account with this email or phone already exists. Sign in instead."
         });
       }
-      return res.status(409).json({ message: "Email or phone number is already registered" });
+
+      if (existing.email === normalizedEmail && existing.phone === phone) {
+        existing.name = name;
+        await existing.setPassword(password);
+        await existing.save();
+        await sendEmailOtp(normalizedEmail, { name: existing.name });
+
+        return res.status(200).json({
+          message: "Welcome back. Complete email verification to finish signup.",
+          resumeVerification: true,
+          requiresEmailVerification: true,
+          registrationComplete: false,
+          user: existing.toSafeJSON()
+        });
+      }
+
+      if (existing.email === normalizedEmail) {
+        return res.status(409).json({
+          message: "This email is awaiting verification with a different phone number. Use that phone or choose a different email."
+        });
+      }
+
+      return res.status(409).json({
+        message: "This phone number is awaiting verification with a different email. Use that email or choose a different phone."
+      });
     }
 
     const user = new User({
       name,
-      email,
+      email: normalizedEmail,
       phone,
-      phoneVerified: false
+      emailVerified: false
     });
     await user.setPassword(password);
     await user.save();
 
-    await sendPhoneOtp(phone);
+    await sendEmailOtp(normalizedEmail, { name });
 
     return res.status(201).json({
-      message: "Account created. OTP sent to your phone for verification.",
-      requiresPhoneVerification: true,
+      message: "Account created. OTP sent to your email for verification.",
+      requiresEmailVerification: true,
       registrationComplete: false,
       user: user.toSafeJSON()
     });
@@ -111,14 +150,18 @@ export async function signup(req, res, next) {
 export async function signin(req, res, next) {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+passwordHash");
+    const user = await User.findOne({ email: normalizeEmail(email) }).select("+passwordHash");
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    if (!user.phoneVerified) {
-      return res.status(403).json({ message: "Complete phone verification before signing in" });
+    if (!user.emailVerified) {
+      return res.status(403).json({ message: "Complete email verification before signing in" });
+    }
+
+    if (isAdminRole(user.role)) {
+      return res.status(403).json({ message: "This account must sign in through the admin portal" });
     }
 
     user.lastLoginAt = new Date();
@@ -133,17 +176,17 @@ export async function signin(req, res, next) {
 export async function adminSignin(req, res, next) {
   try {
     const { email, password, adminRole } = req.body;
-    const user = await User.findOne({ email }).select("+passwordHash");
+    const user = await User.findOne({ email: normalizeEmail(email) }).select("+passwordHash");
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid admin email or password" });
     }
 
-    if (!user.phoneVerified) {
-      return res.status(403).json({ message: "Complete phone verification before signing in" });
+    if (!user.emailVerified) {
+      return res.status(403).json({ message: "Complete email verification before signing in" });
     }
 
-    if (!["admin", "rta_admin", "amc_admin"].includes(user.role)) {
+    if (!isAdminRole(user.role)) {
       return res.status(403).json({ message: "This account is not allowed to access the admin dashboard" });
     }
 
@@ -160,19 +203,24 @@ export async function adminSignin(req, res, next) {
   }
 }
 
-export async function phoneLogin(req, res, next) {
+export async function emailLogin(req, res, next) {
   try {
-    const user = await User.findOne({ phone: req.body.phone });
+    const email = normalizeEmail(req.body.email);
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: "No account registered with this phone number" });
+      return res.status(404).json({ message: "No account registered with this email address" });
     }
 
-    if (!user.phoneVerified) {
-      return res.status(403).json({ message: "Complete phone verification before signing in" });
+    if (!user.emailVerified) {
+      return res.status(403).json({ message: "Complete email verification before signing in" });
     }
 
-    const otpVerified = await verifyPhoneOtp(req.body.phone, req.body.otp);
+    if (isAdminRole(user.role)) {
+      return res.status(403).json({ message: "This account must sign in through the admin portal" });
+    }
+
+    const otpVerified = await verifyEmailOtp(email, req.body.otp);
 
     if (!otpVerified) {
       return res.status(401).json({ message: "Invalid or expired OTP" });

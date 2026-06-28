@@ -1,9 +1,9 @@
-import { Check, Smartphone, UserRound } from "lucide-react";
+import { Check, Mail, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
   { n: 1, label: "Your details", Icon: UserRound },
-  { n: 2, label: "Verify phone", Icon: Smartphone },
+  { n: 2, label: "Verify email", Icon: Mail },
 ];
 
 function StepNode({ step, s }) {

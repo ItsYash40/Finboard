@@ -57,7 +57,7 @@ async function upsertUser(account) {
     user.name = account.name;
     user.phone = account.phone;
     user.role = account.role;
-    user.phoneVerified = true;
+    user.emailVerified = true;
     await user.setPassword(account.password);
     await user.save();
     console.log(`Updated ${account.role} user: ${account.email}`);
@@ -69,7 +69,7 @@ async function upsertUser(account) {
     email: account.email,
     phone: account.phone,
     role: account.role,
-    phoneVerified: true
+    emailVerified: true
   });
   await created.setPassword(account.password);
   await created.save();

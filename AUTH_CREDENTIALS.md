@@ -27,27 +27,20 @@
 
 ---
 
-## Phone OTP (dev fallback)
+## Email OTP (Resend)
 
-Twilio is not configured locally. A **random 6-digit OTP** is generated per request.
-
-| Variable | Value |
-|----------|-------|
-| `TWILIO_OTP_TTL_MINUTES` | `5` |
-
-Find the OTP in the auth-service console:
-- Phone OTP: `[DEV] Phone OTP for +91...`
-- Password reset: `[DEV] Password reset OTP for email@...`
-
----
-
-## Email / SMTP
-
-SMTP is not configured locally. Password-reset and notification emails log to the auth/notification service console.
+Verification and password-reset codes are delivered by **Resend** to the account email.
 
 | Variable | Value |
 |----------|-------|
-| `SMTP_FROM` | `noreply@finboard.local` |
+| `RESEND_API_KEY` | Your Resend API key |
+| `RESEND_FROM` | `Finboard <onboarding@resend.dev>` (or your verified domain) |
+| `OTP_TTL_MINUTES` | `5` |
+| `PASSWORD_RESET_OTP_TTL_MINUTES` | `10` |
+
+When Resend is not configured locally, OTPs log to the auth-service console:
+- Signup / login OTP: `[DEV] Email OTP for user@...`
+- Password reset: `[DEV] Password reset OTP for user@...`
 
 ---
 
@@ -76,9 +69,60 @@ After admin login, the **top navbar** on every `/admin/*` page shows only the mo
 
 PAN and Aadhaar come from the KYC identity seed (`pnpm seed:kyc`). Name, PAN, and Aadhaar must match exactly when submitting KYC.
 
-Anurag is in the KYC identity and banking seeds (demo account `100000000012`). Register at `/signup` if the auth account does not exist yet.
+Anurag is in the KYC identity and banking seeds. Register at `/signup` if the auth account does not exist yet.
 
 Override via: `DEMO_USER_*`, `DEMO_USER2_*`.
+
+---
+
+## Seeded bank accounts (dashboard verify-bank)
+
+Seed with `pnpm seed:banking`. All accounts use **IFSC** `DEMO0000001` and bank **Finboard Demo Bank**.
+
+> **Important:** `accountHolderName` must match the seeded **holder name exactly** (case-insensitive). A typo such as `Anurag Swarnaka` instead of `Anurag Swarnakar` returns `Invalid bank account details`.
+
+### Customer app users (sign in → verify on dashboard)
+
+| Auth email | Account holder (use exactly) | Account number | Seeded balance | Bank seed email |
+|------------|------------------------------|----------------|----------------|-----------------|
+| `user@finboard.local` | Rahul Sharma | `100000000002` | ₹15,000.00 | `rahul.sharma@testbank.local` |
+| `priya@finboard.local` | Priya Singh | `100000000003` | ₹9,500.00 | `priya.singh@testbank.local` |
+| `anurag@finboard.local` | Anurag Swarnakar | `100000000012` | ₹20,000.00 | `anurag@finboard.local` |
+
+**Verify-bank payload example (Rahul):**
+
+```json
+{
+  "accountHolderName": "Rahul Sharma",
+  "accountNumber": "100000000002",
+  "ifsc": "DEMO0000001"
+}
+```
+
+Verification debits **₹2** (refunded automatically in the demo flow).
+
+### Banking admin (API only — not a Finboard auth login)
+
+| Account holder | Email | Account number | Seeded balance | Role |
+|----------------|-------|----------------|----------------|------|
+| Demo Bank Admin | `admin@demobank.test` | `100000000001` | ₹10,00,000.00 | `ADMIN` |
+
+Use a platform admin JWT (`admin@finboard.local`) for `/api/banking/admin/*`, not this email.
+
+### Extra demo bank accounts (transfers / beneficiaries)
+
+These exist in the banking DB for peer transfers. They are **not** linked to Finboard auth logins.
+
+| Account holder | Email | Phone | Account number | Seeded balance |
+|----------------|-------|-------|----------------|----------------|
+| Aarav Mehta | `aarav.mehta@testbank.local` | `+919000000004` | `100000000004` | ₹22,000.00 |
+| Neha Kapoor | `neha.kapoor@testbank.local` | `+919000000005` | `100000000005` | ₹18,450.00 |
+| Vikram Rao | `vikram.rao@testbank.local` | `+919000000006` | `100000000006` | ₹31,200.00 |
+| Ananya Das | `ananya.das@testbank.local` | `+919000000007` | `100000000007` | ₹12,750.00 |
+| Kabir Khan | `kabir.khan@testbank.local` | `+919000000008` | `100000000008` | ₹40,000.00 |
+| Meera Iyer | `meera.iyer@testbank.local` | `+919000000009` | `100000000009` | ₹7,600.00 |
+| Rohan Verma | `rohan.verma@testbank.local` | `+919000000010` | `100000000010` | ₹25,800.00 |
+| Isha Nair | `isha.nair@testbank.local` | `+919000000011` | `100000000011` | ₹11,000.00 |
 
 ---
 
@@ -86,15 +130,16 @@ Override via: `DEMO_USER_*`, `DEMO_USER2_*`.
 
 Use these logins when testing `/api/banking/*` in Swagger (`http://localhost:4000/docs`) or Postman.
 
-| Account | Email | JWT `role` | Customer `/api/banking/*` | Admin `/api/banking/admin/*` |
-|---------|-------|------------|---------------------------|------------------------------|
-| Rahul Sharma | user@finboard.local | `user` | Yes | No |
-| Priya Singh | priya@finboard.local | `user` | Yes | No |
-| Anurag Swarnakar | anurag@finboard.local | `user` | Yes (account `100000000012`) | No |
-| KYC Review Admin | admin@finboard.local | `admin` | No | Yes |
-| Operations Admin | ops.admin@finboard.local | `admin` | No | Yes |
-| RTA Records Admin | rta.admin@finboard.local | `rta_admin` | No | No |
-| AMC Scheme Manager | amc.admin@finboard.local | `amc_admin` | No | No |
+| Account | Email | Bank account | JWT `role` | Customer `/api/banking/*` | Admin `/api/banking/admin/*` |
+|---------|-------|--------------|------------|---------------------------|------------------------------|
+| Rahul Sharma | user@finboard.local | `100000000002` | `user` | Yes | No |
+| Priya Singh | priya@finboard.local | `100000000003` | `user` | Yes | No |
+| Anurag Swarnakar | anurag@finboard.local | `100000000012` | `user` | Yes | No |
+| KYC Review Admin | admin@finboard.local | — | `admin` | No | Yes |
+| Operations Admin | ops.admin@finboard.local | — | `admin` | No | Yes |
+| RTA Records Admin | rta.admin@finboard.local | — | `rta_admin` | No | No |
+| AMC Scheme Manager | amc.admin@finboard.local | — | `amc_admin` | No | No |
+| Demo Bank Admin | admin@demobank.test | `100000000001` | — | No | Yes (via admin JWT) |
 
 **Example:** Sign in as `user@finboard.local`, call `GET /api/banking/demo-accounts` → 200. Sign in as `admin@finboard.local`, same endpoint → 403.
 
@@ -121,31 +166,40 @@ API: `GET /api/audit/kyc/{kycApplicationId}` with admin or RTA JWT.
 **Customer app — Rahul Sharma**
 
 ```
-Email:    user@finboard.local
-Password: User@12345
-Phone:    +919876543210
-PAN:      ABCPS1234F
-Aadhaar:  111222333445
+Email:              user@finboard.local
+Password:           User@12345
+Phone:              +919876543210
+PAN:                ABCPS1234F
+Aadhaar:            111222333445
+Bank holder name:   Rahul Sharma
+Bank account:       100000000002
+IFSC:               DEMO0000001
 ```
 
 **Customer app — Priya Singh**
 
 ```
-Email:    priya@finboard.local
-Password: User@12345
-Phone:    +919876543211
-PAN:      PQRPS6789K
-Aadhaar:  222333444555
+Email:              priya@finboard.local
+Password:           User@12345
+Phone:              +919876543211
+PAN:                PQRPS6789K
+Aadhaar:            222333444555
+Bank holder name:   Priya Singh
+Bank account:       100000000003
+IFSC:               DEMO0000001
 ```
 
 **Customer app — Anurag Swarnakar**
 
 ```
-Email:    anurag@finboard.local
-Password: User@12345
-Phone:    +919348404335
-PAN:      QMRPS6975K
-Aadhaar:  634441264716
+Email:              anurag@finboard.local
+Password:           User@12345
+Phone:              +919348404335
+PAN:                QMRPS6975K
+Aadhaar:            634441264716
+Bank holder name:   Anurag Swarnakar
+Bank account:       100000000012
+IFSC:               DEMO0000001
 ```
 
 **Admin (KYC review)**
@@ -181,4 +235,10 @@ pnpm seed:admin
 
 ```bash
 pnpm seed:kyc
+```
+
+## Reseed bank accounts
+
+```bash
+pnpm seed:banking
 ```

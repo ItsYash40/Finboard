@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getDefaultAdminRoute } from "@/features/admin/config/admin-nav.config";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isAdminRole } from "../lib/roles";
 import { useAuth } from "../context/auth-context";
 
 export default function ProtectedRoute({ children, requiredRole }) {
@@ -12,6 +14,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   const needsAdmin =
     allowedRoles.length > 0 &&
     allowedRoles.some((role) => ["admin", "rta_admin", "amc_admin"].includes(role));
+  const isCustomerRoute = allowedRoles.length === 0;
 
   useEffect(() => {
     if (!ready) {
@@ -23,10 +26,15 @@ export default function ProtectedRoute({ children, requiredRole }) {
       return;
     }
 
-    if (allowedRoles.length && !allowedRoles.includes(user?.role)) {
-      router.replace("/dashboard");
+    if (isCustomerRoute && isAdminRole(user?.role)) {
+      router.replace(getDefaultAdminRoute(user.role));
+      return;
     }
-  }, [ready, token, user, allowedRoles, needsAdmin, router]);
+
+    if (allowedRoles.length && !allowedRoles.includes(user?.role)) {
+      router.replace(isAdminRole(user?.role) ? getDefaultAdminRoute(user.role) : "/dashboard");
+    }
+  }, [ready, token, user, allowedRoles, needsAdmin, isCustomerRoute, router]);
 
   if (!ready) {
     return (
@@ -38,6 +46,10 @@ export default function ProtectedRoute({ children, requiredRole }) {
   }
 
   if (!token) {
+    return null;
+  }
+
+  if (isCustomerRoute && isAdminRole(user?.role)) {
     return null;
   }
 

@@ -25,23 +25,13 @@ export function getServiceEnv(defaults = {}) {
     mistralVisionModel: process.env.MISTRAL_VISION_MODEL || "pixtral-12b-latest",
     mistralOcrModel: process.env.MISTRAL_OCR_MODEL || "mistral-ocr-latest",
     llmMaxTokens: Number(process.env.LLM_MAX_TOKENS || 256),
-    twilio: {
-      accountSid: process.env.TWILIO_ACCOUNT_SID,
-      authToken: process.env.TWILIO_AUTH_TOKEN,
-      apiKeySid: process.env.TWILIO_API_KEY_SID,
-      apiKeySecret: process.env.TWILIO_API_KEY_SECRET,
-      verifyServiceSid: process.env.TWILIO_VERIFY_SERVICE_SID,
-      fromPhone: process.env.TWILIO_FROM_PHONE,
-      messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
-      otpTtlMinutes: Number(process.env.TWILIO_OTP_TTL_MINUTES || 5)
+    otp: {
+      ttlMinutes: Number(process.env.OTP_TTL_MINUTES || 5),
+      passwordResetTtlMinutes: Number(process.env.PASSWORD_RESET_OTP_TTL_MINUTES || 10)
     },
-    smtp: {
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === "true",
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-      from: process.env.SMTP_FROM || "noreply@finboard.local"
+    resend: {
+      apiKey: process.env.RESEND_API_KEY,
+      from: process.env.RESEND_FROM
     },
     kafka: {
       brokers: (process.env.KAFKA_BROKERS || process.env.KAFKA_BROKER || "")

@@ -1,13 +1,8 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import { getServiceEnv } from "@finboard/config";
+import { isResendConfigured, sendOtpEmail } from "@finboard/email";
 
 const emailOtpStore = new Map();
-
-function isSmtpConfigured() {
-  const { smtp } = getServiceEnv();
-  return Boolean(smtp.host && smtp.user && smtp.pass);
-}
 
 function createOtp() {
   return String(crypto.randomInt(100000, 999999));
@@ -17,37 +12,35 @@ function hashOtp(otp) {
   return crypto.createHash("sha256").update(String(otp)).digest("hex");
 }
 
+function getPasswordResetTtlMs() {
+  return getServiceEnv().otp.passwordResetTtlMinutes * 60 * 1000;
+}
+
 export async function sendPasswordResetOtp(email) {
-  const env = getServiceEnv();
   const key = email.toLowerCase();
   const otp = createOtp();
+  const ttlMinutes = getServiceEnv().otp.passwordResetTtlMinutes;
 
   emailOtpStore.set(key, {
     otpHash: hashOtp(otp),
-    expiresAt: Date.now() + 10 * 60 * 1000
+    expiresAt: Date.now() + getPasswordResetTtlMs()
   });
 
-  if (isSmtpConfigured()) {
-    const transport = nodemailer.createTransport({
-      host: env.smtp.host,
-      port: env.smtp.port,
-      secure: env.smtp.secure,
-      auth: { user: env.smtp.user, pass: env.smtp.pass }
-    });
-    await transport.sendMail({
-      from: env.smtp.from,
-      to: email,
-      subject: "Finboard: Password Reset Code",
-      text: `Your Finboard password reset code is ${otp}. It expires in 10 minutes.`,
-      html: `<p>Your Finboard password reset code is <strong>${otp}</strong>. It expires in 10 minutes.</p>`
-    });
-    return { provider: "smtp" };
+  const result = await sendOtpEmail({
+    to: email,
+    otp,
+    ttlMinutes,
+    purpose: "password_reset"
+  });
+
+  if (result.provider === "development") {
+    console.log(`[DEV] Password reset OTP for ${email}: ${otp}`);
+    if (!isResendConfigured()) {
+      console.warn("[OTP] Resend is not configured. Add RESEND_API_KEY and RESEND_FROM to send real email.");
+    }
   }
 
-  console.log(`[DEV] Password reset OTP for ${email}: ${otp}`);
-  return {
-    provider: "development"
-  };
+  return { provider: result.provider };
 }
 
 export function verifyPasswordResetOtp(email, otp) {

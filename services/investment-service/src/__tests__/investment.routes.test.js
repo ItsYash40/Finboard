@@ -31,7 +31,8 @@ registerLocalAuthHandler({
     name: "Test User",
     email: `${id}@test.com`,
     role: id === ADMIN_USER_ID ? "admin" : id === AMC_ADMIN_USER_ID ? "amc_admin" : "user",
-    phoneVerified: true
+    phoneVerified: true,
+    emailVerified: true
   }),
   listUsersByRole: async (_role) => {
     return [

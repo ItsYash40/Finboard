@@ -81,7 +81,7 @@ registerLocalAuthHandler({
       phone: known?.phone || "+919000000099",
       role: known?.role || (userId.startsWith("admin") ? "admin" : "user"),
       phoneVerified: true,
-      emailVerified: false
+      emailVerified: true
     };
   }
 });

@@ -28,7 +28,7 @@ const TEST_USER = {
   phone: "+919876540000",
   role: "user",
   phoneVerified: true,
-  emailVerified: false
+  emailVerified: true
 };
 
 // Wire local auth handler — requireAuth will use this instead of calling auth-service HTTP

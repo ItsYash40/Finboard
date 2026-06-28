@@ -239,7 +239,7 @@ Useful endpoints:
 POST /api/auth/send-otp
 POST /api/auth/verify-otp
 POST /api/auth/signup
-POST /api/auth/phone-login
+POST /api/auth/email-login
 ```
 
 PowerShell test:
@@ -249,7 +249,7 @@ Invoke-RestMethod `
   -Uri "http://localhost:4000/api/auth/send-otp" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"phone":"+919876543210"}'
+  -Body '{"email":"user@finboard.local"}'
 ```
 
 ```powershell
@@ -257,7 +257,7 @@ Invoke-RestMethod `
   -Uri "http://localhost:4000/api/auth/verify-otp" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"phone":"+919876543210","otp":"123456"}'
+  -Body '{"email":"user@finboard.local","otp":"123456"}'
 ```
 
 ## KYC Flow
