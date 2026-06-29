@@ -23,6 +23,11 @@
 
 ## Architecture
 
+![Finboard Architecture](docs/architecture.svg)
+
+<details>
+<summary>Mermaid text diagram (GitHub fallback)</summary>
+
 ```mermaid
 graph TB
     subgraph CLIENT["🖥️  Client Layer"]
@@ -105,6 +110,8 @@ graph TB
     style PACKAGES fill:#1a2744,stroke:#818cf8,color:#e0e7ff
     style INFRA fill:#14142b,stroke:#a78bfa,color:#ede9fe
 ```
+
+</details>
 
 ---
 

@@ -1,0 +1,481 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 730" width="100%">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="clientGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#172554"/>
+      <stop offset="100%" stop-color="#0c1730"/>
+    </linearGradient>
+    <linearGradient id="gatewayGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d1b69"/>
+      <stop offset="100%" stop-color="#0f0a2e"/>
+    </linearGradient>
+
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#00d2ff"/>
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#a855f7"/>
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#39ff14"/>
+    </marker>
+    <marker id="arr-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ff9f00"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #f8fafc; }
+    @keyframes flow { to { stroke-dashoffset: -40; } }
+    .track  { fill: none; stroke: #1e293b; stroke-width: 2; }
+    .f-cyan   { fill: none; stroke: #00d2ff; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.2s linear infinite; }
+    .f-purple { fill: none; stroke: #a855f7; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.0s linear infinite; }
+    .f-green  { fill: none; stroke: #39ff14; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.4s linear infinite; }
+    .f-orange { fill: none; stroke: #ff9f00; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.6s linear infinite; }
+    .f-amber  { fill: none; stroke: #f59e0b; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.3s linear infinite; }
+    .f-red    { fill: none; stroke: #ef4444; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 0.9s linear infinite; }
+  </style>
+
+  <!-- ── Background ── -->
+  <rect width="1400" height="730" fill="url(#bgGrad)"/>
+  <rect width="1400" height="730" fill="url(#grid)"/>
+
+  <!-- ── Header ── -->
+  <text x="40" y="42" font-size="22" font-weight="800" fill="#f8fafc" letter-spacing="-0.5">Finboard — End-to-End Fintech Platform Architecture</text>
+  <text x="40" y="62" font-size="12" fill="#64748b">KYC · Banking · Investments · 9 Microservices · Event-Driven · pnpm Monorepo</text>
+
+  <!-- ── Legend ── -->
+  <g transform="translate(870, 32)">
+    <rect width="490" height="40" fill="#111827" stroke="#1e293b" stroke-width="1" rx="6"/>
+    <line x1="14" y1="20" x2="44" y2="20" stroke="#00d2ff" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="50" y="24" font-size="10" fill="#cbd5e1" font-weight="600">HTTP / REST</text>
+    <line x1="140" y1="20" x2="170" y2="20" stroke="#a855f7" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="176" y="24" font-size="10" fill="#cbd5e1" font-weight="600">Gateway Route</text>
+    <line x1="275" y1="20" x2="305" y2="20" stroke="#39ff14" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="311" y="24" font-size="10" fill="#cbd5e1" font-weight="600">DB Write</text>
+    <line x1="375" y1="20" x2="405" y2="20" stroke="#ff9f00" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="411" y="24" font-size="10" fill="#cbd5e1" font-weight="600">Kafka Events</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════
+       FLOW LINES  (drawn before nodes so they sit behind)
+       ══════════════════════════════════════════════════════ -->
+
+  <!-- Client → Gateway -->
+  <path class="track" d="M 700 168 L 700 228"/>
+  <path class="f-cyan"   d="M 700 168 L 700 228" marker-end="url(#arr-cyan)"/>
+
+  <!-- Gateway fan-out → services (purple) -->
+  <!-- auth cx=120 -->
+  <path class="track"    d="M 700 308 C 700 344 120 344 120 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 120 344 120 368" marker-end="url(#arr-purple)"/>
+  <!-- profile cx=285 -->
+  <path class="track"    d="M 700 308 C 700 344 285 344 285 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 285 344 285 368" marker-end="url(#arr-purple)"/>
+  <!-- kyc cx=450 -->
+  <path class="track"    d="M 700 308 C 700 344 450 344 450 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 450 344 450 368" marker-end="url(#arr-purple)"/>
+  <!-- ocr cx=615 -->
+  <path class="track"    d="M 697 308 L 615 368"/>
+  <path class="f-purple" d="M 697 308 L 615 368" marker-end="url(#arr-purple)"/>
+  <!-- banking cx=780 -->
+  <path class="track"    d="M 703 308 L 780 368"/>
+  <path class="f-purple" d="M 703 308 L 780 368" marker-end="url(#arr-purple)"/>
+  <!-- invest cx=945 -->
+  <path class="track"    d="M 700 308 C 700 344 945 344 945 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 945 344 945 368" marker-end="url(#arr-purple)"/>
+  <!-- notify cx=1110 -->
+  <path class="track"    d="M 700 308 C 700 344 1110 344 1110 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 1110 344 1110 368" marker-end="url(#arr-purple)"/>
+  <!-- audit cx=1275 -->
+  <path class="track"    d="M 700 308 C 700 344 1275 344 1275 368"/>
+  <path class="f-purple" d="M 700 308 C 700 344 1275 344 1275 368" marker-end="url(#arr-purple)"/>
+
+  <!-- Services → MongoDB (green) -->
+  <!-- auth cx=120 → mongo cx=220 -->
+  <path class="track"   d="M 120 458 L 120 500 L 190 500 L 190 528"/>
+  <path class="f-green" d="M 120 458 L 120 500 L 190 500 L 190 528" marker-end="url(#arr-green)"/>
+  <!-- profile cx=285 → mongo -->
+  <path class="track"   d="M 285 458 L 285 504 L 220 504 L 220 528"/>
+  <path class="f-green" d="M 285 458 L 285 504 L 220 504 L 220 528" marker-end="url(#arr-green)"/>
+  <!-- kyc cx=450 → mongo -->
+  <path class="track"   d="M 445 458 L 445 496 L 250 496 L 250 528"/>
+  <path class="f-green" d="M 445 458 L 445 496 L 250 496 L 250 528" marker-end="url(#arr-green)"/>
+  <!-- invest cx=945 → mongo -->
+  <path class="track"   d="M 940 458 L 940 508 L 270 508 L 270 528"/>
+  <path class="f-green" d="M 940 458 L 940 508 L 270 508 L 270 528" marker-end="url(#arr-green)"/>
+  <!-- notify cx=1110 → mongo -->
+  <path class="track"   d="M 1105 458 L 1105 512 L 290 512 L 290 528"/>
+  <path class="f-green" d="M 1105 458 L 1105 512 L 290 512 L 290 528" marker-end="url(#arr-green)"/>
+
+  <!-- banking cx=780 → PostgreSQL cx=680 -->
+  <path class="track"   d="M 780 458 L 780 528"/>
+  <path class="f-green" d="M 780 458 L 780 528" marker-end="url(#arr-green)"/>
+
+  <!-- kyc cx=450 → MinIO cx=470 (cyan) -->
+  <path class="track"  d="M 455 458 L 455 492 L 470 492 L 470 528"/>
+  <path class="f-cyan" d="M 455 458 L 455 492 L 470 492 L 470 528" marker-end="url(#arr-cyan)"/>
+  <!-- ocr cx=615 → MinIO (cyan) -->
+  <path class="track"  d="M 615 458 L 615 506 L 510 506 L 510 528"/>
+  <path class="f-cyan" d="M 615 458 L 615 506 L 510 506 L 510 528" marker-end="url(#arr-cyan)"/>
+
+  <!-- auth cx=120 → Kafka cx=900 (orange) -->
+  <path class="track"    d="M 155 458 L 155 518 L 860 518 L 860 528"/>
+  <path class="f-orange" d="M 155 458 L 155 518 L 860 518 L 860 528" marker-end="url(#arr-orange)"/>
+  <!-- kyc cx=450 → Kafka (orange) -->
+  <path class="track"    d="M 485 458 L 485 514 L 880 514 L 880 528"/>
+  <path class="f-orange" d="M 485 458 L 485 514 L 880 514 L 880 528" marker-end="url(#arr-orange)"/>
+  <!-- invest cx=945 → Kafka (orange) -->
+  <path class="track"    d="M 950 458 L 950 510 L 930 510 L 930 528"/>
+  <path class="f-orange" d="M 950 458 L 950 510 L 930 510 L 930 528" marker-end="url(#arr-orange)"/>
+  <!-- audit cx=1275 → Kafka (orange) -->
+  <path class="track"    d="M 1275 458 L 1275 516 L 960 516 L 960 528"/>
+  <path class="f-orange" d="M 1275 458 L 1275 516 L 960 516 L 960 528" marker-end="url(#arr-orange)"/>
+
+  <!-- Kafka right edge → Zookeeper left edge (amber) -->
+  <path class="track"   d="M 1000 573 L 1020 573"/>
+  <path class="f-amber" d="M 1000 573 L 1020 573" marker-end="url(#arr-amber)"/>
+
+  <!-- OCR internal call: kyc → ocr (red dashed) -->
+  <path class="track" d="M 490 413 L 535 413"/>
+  <path class="f-red" d="M 490 413 L 535 413" marker-end="url(#arr-red)"/>
+
+  <!-- ══════════════════════════════════════════════════════
+       NODES
+       ══════════════════════════════════════════════════════ -->
+
+  <!-- ── Layer 1: Customer Web ── -->
+  <g transform="translate(500, 88)">
+    <rect width="400" height="80" fill="url(#clientGrad)" stroke="#0ea5e9" stroke-width="2" rx="12"/>
+    <!-- Next.js circle icon -->
+    <circle cx="362" cy="40" r="22" fill="#000" stroke="#ffffff" stroke-width="1.5"/>
+    <text x="356" y="46" font-size="16" font-weight="900" fill="#fff">N</text>
+    <text x="22" y="26" font-size="14" font-weight="700" fill="#38bdf8">Customer Web</text>
+    <text x="22" y="44" font-size="10" fill="#7dd3fc">Next.js 15 · React 19 · TanStack Query · Axios</text>
+    <text x="22" y="59" font-size="10" fill="#7dd3fc">Tailwind CSS · Recharts · Lucide Icons · next-themes</text>
+    <rect x="22" y="66" width="46" height="13" fill="#0ea5e9" rx="3" fill-opacity="0.2" stroke="#0ea5e9" stroke-width="0.8"/>
+    <text x="28" y="76" font-size="9" font-weight="700" fill="#38bdf8">:3000</text>
+  </g>
+
+  <!-- ── Layer 2: API Gateway ── -->
+  <g transform="translate(350, 228)">
+    <rect width="700" height="80" fill="url(#gatewayGrad)" stroke="#a855f7" stroke-width="2" rx="12"/>
+    <!-- Shield icon -->
+    <path d="M 662 16 L 682 24 L 682 42 C 682 53 672 60 662 63 C 652 60 642 53 642 42 L 642 24 Z" fill="none" stroke="#a855f7" stroke-width="2"/>
+    <path d="M 655 40 L 660 46 L 671 33" fill="none" stroke="#c084fc" stroke-width="2.5"/>
+    <text x="22" y="26" font-size="15" font-weight="700" fill="#c084fc">API Gateway</text>
+    <text x="22" y="44" font-size="10" fill="#9ca3af">JWT Auth Middleware · Rate Limiting (express-rate-limit) · Request Routing</text>
+    <text x="22" y="60" font-size="10" fill="#9ca3af">CORS · x-service-key internal validation · Error normalisation</text>
+    <rect x="22" y="65" width="46" height="13" fill="#a855f7" rx="3" fill-opacity="0.2" stroke="#a855f7" stroke-width="0.8"/>
+    <text x="28" y="75" font-size="9" font-weight="700" fill="#c084fc">:4000</text>
+  </g>
+
+  <!-- ── Layer 3: Microservices ── -->
+
+  <!-- auth-service -->
+  <g transform="translate(40, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#ec4899" stroke-width="1.5" rx="10"/>
+    <!-- lock icon -->
+    <path d="M 138 36 L 148 36 C 150 36 152 38 152 40 L 152 50 C 152 52 150 54 148 54 L 138 54 C 136 54 134 52 134 50 L 134 40 C 134 38 136 36 138 36 Z" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+    <path d="M 140 36 L 140 32 C 140 29 146 29 146 32 L 146 36" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+    <circle cx="143" cy="45" r="2" fill="#ec4899"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#f472b6">auth-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">Users · OTP · JWT</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">Resend Email</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">bcrypt · Mongoose</text>
+    <rect x="12" y="75" width="42" height="12" fill="#ec4899" rx="2" fill-opacity="0.2" stroke="#ec4899" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#f472b6">:4001</text>
+  </g>
+
+  <!-- profile-service -->
+  <g transform="translate(205, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#06b6d4" stroke-width="1.5" rx="10"/>
+    <!-- user icon -->
+    <circle cx="143" cy="36" r="8" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+    <path d="M 129 55 C 129 48 136 44 143 44 C 150 44 157 48 157 55" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#22d3ee">profile-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">User Profiles</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">Address · Occupation</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Mongoose</text>
+    <rect x="12" y="75" width="42" height="12" fill="#06b6d4" rx="2" fill-opacity="0.2" stroke="#06b6d4" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#22d3ee">:4002</text>
+  </g>
+
+  <!-- kyc-service -->
+  <g transform="translate(370, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#f59e0b" stroke-width="1.5" rx="10"/>
+    <!-- document icon -->
+    <path d="M 133 28 L 143 28 L 153 38 L 153 58 L 133 58 Z" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <path d="M 143 28 L 143 38 L 153 38" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="138" y1="44" x2="148" y2="44" stroke="#f59e0b" stroke-width="1"/>
+    <line x1="138" y1="50" x2="148" y2="50" stroke="#f59e0b" stroke-width="1"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#fbbf24">kyc-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">KYC Applications</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">PAN · Aadhaar Review</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Admin Approve/Reject</text>
+    <rect x="12" y="75" width="42" height="12" fill="#f59e0b" rx="2" fill-opacity="0.2" stroke="#f59e0b" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#fbbf24">:4003</text>
+  </g>
+
+  <!-- ocr-service -->
+  <g transform="translate(535, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#ef4444" stroke-width="1.5" rx="10"/>
+    <!-- scan icon -->
+    <rect x="132" y="30" width="24" height="28" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+    <line x1="128" y1="38" x2="160" y2="38" stroke="#ef4444" stroke-width="1"/>
+    <line x1="128" y1="44" x2="160" y2="44" stroke="#ef4444" stroke-width="1"/>
+    <line x1="128" y1="50" x2="160" y2="50" stroke="#ef4444" stroke-width="1"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#f87171">ocr-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">Tesseract.js OCR</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">OpenRouter AI</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Doc Field Extraction</text>
+    <rect x="12" y="75" width="42" height="12" fill="#ef4444" rx="2" fill-opacity="0.2" stroke="#ef4444" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#f87171">:4004</text>
+  </g>
+
+  <!-- banking-service -->
+  <g transform="translate(700, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5" rx="10"/>
+    <!-- bank icon -->
+    <path d="M 132 56 L 157 56 L 157 40 L 144 32 L 132 40 Z" fill="none" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="136" y="44" width="5" height="12" fill="#10b981"/>
+    <rect x="143" y="44" width="5" height="12" fill="#10b981"/>
+    <rect x="150" y="44" width="5" height="12" fill="#10b981"/>
+    <text x="12" y="22" font-size="11" font-weight="700" fill="#34d399">banking-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">Core Banking Sim</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">Transfers · Prisma</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">PostgreSQL only</text>
+    <rect x="12" y="75" width="42" height="12" fill="#10b981" rx="2" fill-opacity="0.2" stroke="#10b981" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#34d399">:4005</text>
+  </g>
+
+  <!-- investment-service -->
+  <g transform="translate(865, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#3b82f6" stroke-width="1.5" rx="10"/>
+    <!-- chart bars icon -->
+    <rect x="133" y="46" width="5" height="12" fill="#3b82f6"/>
+    <rect x="140" y="38" width="5" height="20" fill="#3b82f6"/>
+    <rect x="147" y="42" width="5" height="16" fill="#3b82f6"/>
+    <rect x="154" y="34" width="5" height="24" fill="#3b82f6"/>
+    <line x1="131" y1="59" x2="161" y2="59" stroke="#3b82f6" stroke-width="1"/>
+    <text x="12" y="22" font-size="11" font-weight="700" fill="#60a5fa">investment-svc</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">Stocks · MF · SIP</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">Portfolio · Orders</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Holdings · Mongoose</text>
+    <rect x="12" y="75" width="42" height="12" fill="#3b82f6" rx="2" fill-opacity="0.2" stroke="#3b82f6" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#60a5fa">:4006</text>
+  </g>
+
+  <!-- notification-service -->
+  <g transform="translate(1030, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="1.5" rx="10"/>
+    <!-- bell icon -->
+    <path d="M 143 28 C 143 28 135 30 135 42 L 135 50 L 152 50 L 152 42 C 152 30 144 28 143 28 Z" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>
+    <path d="M 139 50 C 139 53 148 53 148 50" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>
+    <line x1="143" y1="26" x2="143" y2="28" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="12" y="22" font-size="11" font-weight="700" fill="#a78bfa">notification-svc</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">In-App Alerts</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">Banking Notifs</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Mongoose</text>
+    <rect x="12" y="75" width="42" height="12" fill="#8b5cf6" rx="2" fill-opacity="0.2" stroke="#8b5cf6" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#a78bfa">:4007</text>
+  </g>
+
+  <!-- audit-service -->
+  <g transform="translate(1195, 368)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#64748b" stroke-width="1.5" rx="10"/>
+    <!-- clipboard icon -->
+    <rect x="133" y="30" width="26" height="28" fill="none" stroke="#64748b" stroke-width="1.5" rx="2"/>
+    <rect x="139" y="27" width="14" height="6" fill="#0f172a" stroke="#64748b" stroke-width="1" rx="1"/>
+    <line x1="138" y1="40" x2="154" y2="40" stroke="#64748b" stroke-width="1"/>
+    <line x1="138" y1="46" x2="154" y2="46" stroke="#64748b" stroke-width="1"/>
+    <line x1="138" y1="52" x2="148" y2="52" stroke="#64748b" stroke-width="1"/>
+    <text x="12" y="22" font-size="12" font-weight="700" fill="#94a3b8">audit-service</text>
+    <text x="12" y="38" font-size="9" fill="#94a3b8">Immutable Audit Log</text>
+    <text x="12" y="51" font-size="9" fill="#94a3b8">All Domain Events</text>
+    <text x="12" y="64" font-size="9" fill="#94a3b8">Mongoose</text>
+    <rect x="12" y="75" width="42" height="12" fill="#64748b" rx="2" fill-opacity="0.2" stroke="#64748b" stroke-width="0.6"/>
+    <text x="17" y="84" font-size="9" font-weight="700" fill="#94a3b8">:4008</text>
+  </g>
+
+  <!-- ── Layer 4: Infrastructure ── -->
+
+  <!-- MongoDB -->
+  <g transform="translate(50, 528)">
+    <rect width="290" height="90" fill="url(#cardGrad)" stroke="#47a248" stroke-width="1.5" rx="10"/>
+    <!-- leaf icon -->
+    <path d="M 260 16 C 260 6 272 4 274 18 C 276 30 268 40 262 44 C 262 34 260 26 260 16 Z" fill="#47a248"/>
+    <path d="M 272 18 C 272 6 284 4 286 18 C 288 30 280 40 274 44 C 274 34 272 26 272 18 Z" fill="#47a248" opacity="0.65"/>
+    <text x="16" y="25" font-size="13" font-weight="700" fill="#4ade80">MongoDB 7</text>
+    <text x="16" y="42" font-size="10" fill="#94a3b8">Auth · Profile · KYC · Notifications</text>
+    <text x="16" y="57" font-size="10" fill="#94a3b8">Investments · Audit · Identity records</text>
+    <text x="16" y="72" font-size="10" fill="#94a3b8">Mongoose ODM</text>
+    <rect x="16" y="76" width="50" height="12" fill="#47a248" rx="2" fill-opacity="0.2" stroke="#47a248" stroke-width="0.6"/>
+    <text x="21" y="85" font-size="9" font-weight="700" fill="#4ade80">:27017</text>
+  </g>
+
+  <!-- MinIO -->
+  <g transform="translate(360, 528)">
+    <rect width="190" height="90" fill="url(#cardGrad)" stroke="#e54d2e" stroke-width="1.5" rx="10"/>
+    <!-- bucket icon -->
+    <ellipse cx="163" cy="32" rx="16" ry="7" fill="none" stroke="#e54d2e" stroke-width="1.5"/>
+    <path d="M 147 32 L 147 50 C 147 55 155 59 163 59 C 171 59 179 55 179 50 L 179 32" fill="none" stroke="#e54d2e" stroke-width="1.5"/>
+    <text x="16" y="25" font-size="13" font-weight="700" fill="#ff6b47">MinIO S3</text>
+    <text x="16" y="42" font-size="10" fill="#94a3b8">KYC Documents</text>
+    <text x="16" y="57" font-size="10" fill="#94a3b8">PAN · Aadhaar Images</text>
+    <text x="16" y="72" font-size="10" fill="#94a3b8">S3-Compatible · Console :9001</text>
+    <rect x="16" y="76" width="40" height="12" fill="#e54d2e" rx="2" fill-opacity="0.2" stroke="#e54d2e" stroke-width="0.6"/>
+    <text x="21" y="85" font-size="9" font-weight="700" fill="#ff6b47">:9000</text>
+  </g>
+
+  <!-- PostgreSQL -->
+  <g transform="translate(570, 528)">
+    <rect width="210" height="90" fill="url(#cardGrad)" stroke="#336791" stroke-width="1.5" rx="10"/>
+    <!-- pg elephant -->
+    <circle cx="180" cy="40" r="20" fill="#1e293b" stroke="#336791" stroke-width="1.5"/>
+    <path d="M 172 38 C 172 31 177 28 181 28 C 185 28 190 31 190 36 C 190 41 186 43 183 44 L 184 50 L 180 51 L 179 44 C 174 42 172 40 172 38 Z" fill="#336791"/>
+    <path d="M 170 39 L 168 41 C 168 41 170 45 169 46 Z" fill="#336791" opacity="0.8"/>
+    <text x="16" y="25" font-size="13" font-weight="700" fill="#5b9bd5">PostgreSQL 16</text>
+    <text x="16" y="42" font-size="10" fill="#94a3b8">Banking data only</text>
+    <text x="16" y="57" font-size="10" fill="#94a3b8">Accounts · Transfers · Ledger</text>
+    <text x="16" y="72" font-size="10" fill="#94a3b8">Prisma ORM · sslmode=require</text>
+    <rect x="16" y="76" width="40" height="12" fill="#336791" rx="2" fill-opacity="0.2" stroke="#336791" stroke-width="0.6"/>
+    <text x="21" y="85" font-size="9" font-weight="700" fill="#5b9bd5">:5432</text>
+  </g>
+
+  <!-- Kafka -->
+  <g transform="translate(800, 528)">
+    <rect width="200" height="90" fill="url(#cardGrad)" stroke="#ff9f00" stroke-width="1.5" rx="10"/>
+    <!-- partition lines icon -->
+    <line x1="168" y1="22" x2="168" y2="58" stroke="#ff9f00" stroke-width="2"/>
+    <line x1="176" y1="22" x2="176" y2="58" stroke="#ff9f00" stroke-width="2"/>
+    <line x1="184" y1="22" x2="184" y2="58" stroke="#ff9f00" stroke-width="2"/>
+    <line x1="163" y1="28" x2="190" y2="28" stroke="#ff9f00" stroke-width="1.5"/>
+    <line x1="163" y1="38" x2="190" y2="38" stroke="#ff9f00" stroke-width="1.5"/>
+    <line x1="163" y1="48" x2="190" y2="48" stroke="#ff9f00" stroke-width="1.5"/>
+    <text x="16" y="25" font-size="13" font-weight="700" fill="#fbbf24">Apache Kafka</text>
+    <text x="16" y="42" font-size="10" fill="#94a3b8">Async Event Bus</text>
+    <text x="16" y="57" font-size="10" fill="#94a3b8">Auth · KYC · Invest · Audit</text>
+    <text x="16" y="72" font-size="10" fill="#94a3b8">Confluent Platform 7.6</text>
+    <rect x="16" y="76" width="40" height="12" fill="#ff9f00" rx="2" fill-opacity="0.2" stroke="#ff9f00" stroke-width="0.6"/>
+    <text x="21" y="85" font-size="9" font-weight="700" fill="#fbbf24">:9092</text>
+  </g>
+
+  <!-- Zookeeper -->
+  <g transform="translate(1020, 528)">
+    <rect width="160" height="90" fill="url(#cardGrad)" stroke="#f59e0b" stroke-width="1" rx="10" stroke-dasharray="5 3"/>
+    <!-- tree icon -->
+    <circle cx="134" cy="32" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="122" cy="50" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="146" cy="50" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="134" y1="37" x2="122" y2="45" stroke="#f59e0b" stroke-width="1.2"/>
+    <line x1="134" y1="37" x2="146" y2="45" stroke="#f59e0b" stroke-width="1.2"/>
+    <text x="16" y="25" font-size="12" font-weight="700" fill="#d97706">Zookeeper</text>
+    <text x="16" y="42" font-size="10" fill="#94a3b8">Kafka Coordination</text>
+    <text x="16" y="57" font-size="10" fill="#94a3b8">Leader Election</text>
+    <text x="16" y="72" font-size="10" fill="#94a3b8">Confluent CP 7.6</text>
+    <rect x="16" y="76" width="40" height="12" fill="#f59e0b" rx="2" fill-opacity="0.2" stroke="#f59e0b" stroke-width="0.6"/>
+    <text x="21" y="85" font-size="9" font-weight="700" fill="#d97706">:2181</text>
+  </g>
+
+  <!-- ── Shared Packages Banner ── -->
+  <g transform="translate(40, 642)">
+    <rect width="1320" height="50" fill="#0d1117" stroke="#1e293b" stroke-width="1" rx="8"/>
+    <text x="18" y="19" font-size="10" font-weight="700" fill="#475569" letter-spacing="1.5">SHARED WORKSPACE PACKAGES</text>
+
+    <g transform="translate(18, 26)">
+      <rect width="68" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">contracts</text>
+    </g>
+    <g transform="translate(94, 26)">
+      <rect width="52" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">shared</text>
+    </g>
+    <g transform="translate(154, 26)">
+      <rect width="52" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">config</text>
+    </g>
+    <g transform="translate(214, 26)">
+      <rect width="50" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">logger</text>
+    </g>
+    <g transform="translate(272, 26)">
+      <rect width="48" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">errors</text>
+    </g>
+    <g transform="translate(328, 26)">
+      <rect width="48" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">kafka</text>
+    </g>
+    <g transform="translate(384, 26)">
+      <rect width="58" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">storage</text>
+    </g>
+    <g transform="translate(450, 26)">
+      <rect width="48" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">email</text>
+    </g>
+    <g transform="translate(506, 26)">
+      <rect width="72" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">validation</text>
+    </g>
+    <g transform="translate(586, 26)">
+      <rect width="70" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#818cf8">service-kit</text>
+    </g>
+
+    <!-- Runtime chips -->
+    <text x="690" y="19" font-size="10" font-weight="700" fill="#475569" letter-spacing="1.5">RUNTIME</text>
+    <g transform="translate(690, 26)">
+      <rect width="80" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Node.js 20+</text>
+    </g>
+    <g transform="translate(778, 26)">
+      <rect width="72" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Express 5</text>
+    </g>
+    <g transform="translate(858, 26)">
+      <rect width="48" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Zod</text>
+    </g>
+    <g transform="translate(914, 26)">
+      <rect width="54" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Prisma</text>
+    </g>
+    <g transform="translate(976, 26)">
+      <rect width="90" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">pnpm workspaces</text>
+    </g>
+    <g transform="translate(1074, 26)">
+      <rect width="68" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Turborepo</text>
+    </g>
+    <g transform="translate(1150, 26)">
+      <rect width="52" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Docker</text>
+    </g>
+    <g transform="translate(1210, 26)">
+      <rect width="88" height="15" fill="#1e293b" stroke="#334155" stroke-width="1" rx="3"/>
+      <text x="8" y="10" font-size="9" font-weight="600" fill="#34d399">Tesseract.js</text>
+    </g>
+  </g>
+
+  <!-- ── Footer ── -->
+  <text x="40" y="714" font-size="9" fill="#1e293b">Demo and learning project · Does not connect to real banks, exchanges, or payment gateways</text>
+</svg>
