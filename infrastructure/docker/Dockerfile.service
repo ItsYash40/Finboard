@@ -10,6 +10,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages ./packages
 COPY services ./services
 COPY apps/customer-web/package.json ./apps/customer-web/package.json
+ENV MONGOMS_DISABLE_POSTINSTALL=1
 RUN pnpm install --frozen-lockfile --filter "${SERVICE_PKG}..."
 COPY . .
 RUN if [ -f "${SERVICE_DIR}/prisma/schema.prisma" ]; then \
