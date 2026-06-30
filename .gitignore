@@ -13,3 +13,4 @@ coverage/
 serviceAccountKey.json
 infrastructure/storage/uploads/
 services/banking-service/generated/
+docs/AWS-DEPLOYMENT.md
