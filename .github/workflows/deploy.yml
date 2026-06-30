@@ -105,13 +105,24 @@ jobs:
               run --rm --no-deps banking-service \
               sh -c "cd /app/services/banking-service && DATABASE_URL=\$DATABASE_MIGRATION_URL pnpm exec prisma migrate deploy"
 
-            echo "==> Building and restarting all services (docker compose)"
+            echo "==> Pruning old Docker build cache before rebuild"
+            docker system prune -a -f --filter "until=24h"
+
+            echo "==> Building images sequentially (avoids disk exhaustion from parallel builds)"
             docker compose \
               -f docker-compose.yml \
               -f docker-compose.apps.yml \
               -f docker-compose.prod.yml \
               --env-file .env.production \
-              up --build -d
+              build --parallel 1
+
+            echo "==> Restarting all services (docker compose)"
+            docker compose \
+              -f docker-compose.yml \
+              -f docker-compose.apps.yml \
+              -f docker-compose.prod.yml \
+              --env-file .env.production \
+              up -d
 
             echo "==> Pruning unused Docker images"
             docker image prune -f
