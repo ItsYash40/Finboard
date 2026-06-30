@@ -134,12 +134,15 @@ jobs:
             docker system prune -a -f --filter "until=24h"
 
             echo "==> Building images sequentially (avoids disk exhaustion from parallel builds)"
-            docker compose \
-              -f docker-compose.yml \
-              -f docker-compose.apps.yml \
-              -f docker-compose.prod.yml \
-              --env-file .env.production \
-              build --parallel 1
+            for svc in api-gateway auth-service profile-service kyc-service ocr-service banking-service investment-service notification-service audit-service customer-web; do
+              echo "==> Building $svc"
+              docker compose \
+                -f docker-compose.yml \
+                -f docker-compose.apps.yml \
+                -f docker-compose.prod.yml \
+                --env-file .env.production \
+                build "$svc"
+            done
 
             echo "==> Restarting all services (docker compose)"
             docker compose \
