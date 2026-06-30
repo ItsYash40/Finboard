@@ -17,11 +17,11 @@ export default function StatCard({ icon: Icon, label, value, description, tone }
             <Icon className="size-4 text-primary" aria-hidden />
           </span>
         ) : null}
-        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+        <CardTitle className="truncate text-sm font-medium text-muted-foreground">{label}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+        <p className="text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{value}</p>
+        {description ? <p className="mt-1 truncate text-sm text-muted-foreground">{description}</p> : null}
       </CardContent>
     </Card>
   );

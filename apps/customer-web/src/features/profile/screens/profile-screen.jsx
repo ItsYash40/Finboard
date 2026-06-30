@@ -352,10 +352,10 @@ export default function ProfilePage() {
                 ) : (
                   <div className="divide-y">
                     {displayRows.map(([label, value, editable]) => (
-                      <div key={label} className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
-                        <div className="space-y-1">
+                      <div key={label} className="flex flex-col gap-1 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="min-w-0 space-y-1">
                           <p className="text-sm text-muted-foreground">{label}</p>
-                          <p className="font-medium">{value}</p>
+                          <p className="break-words font-medium">{value}</p>
                         </div>
                         {editable ? <Pencil className="size-4 shrink-0 text-muted-foreground" aria-hidden /> : null}
                       </div>

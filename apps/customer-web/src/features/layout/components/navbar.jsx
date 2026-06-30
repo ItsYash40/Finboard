@@ -51,7 +51,8 @@ const marketLinks = [
 
 const utilityLinks = [
   { href: "/banking", label: "Banking", icon: Landmark, match: (pathname) => pathname === "/banking" },
-  { href: "/kyc", label: "KYC", icon: Shield, match: (pathname) => pathname === "/kyc" }
+  { href: "/kyc", label: "KYC", icon: Shield, match: (pathname) => pathname === "/kyc" },
+  { href: "/documents", label: "Documents", icon: FileCheck2, match: (pathname) => pathname === "/documents" }
 ];
 
 function NavPill({ link, active, onNavigate }) {
@@ -169,7 +170,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-card/95 backdrop-blur-md supports-backdrop-filter:bg-card/80">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-card/95 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-backdrop-filter:bg-card/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:gap-3 sm:px-6">
         {/* Logo */}
         <Link href="/dashboard" className="group flex shrink-0 items-center gap-2.5">
@@ -407,12 +408,6 @@ export default function Navbar() {
                   className="w-full justify-start"
                 />
               ))}
-              <UtilityLink
-                link={{ href: "/documents", label: "Documents", icon: FileCheck2, match: (p) => p === "/documents" }}
-                active={pathname === "/documents"}
-                onNavigate={closeMobile}
-                className="w-full justify-start"
-              />
             </nav>
 
             <div className="mt-auto border-t border-border px-6 py-5">

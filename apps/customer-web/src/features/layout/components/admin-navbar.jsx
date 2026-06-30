@@ -54,8 +54,8 @@ export default function AdminNavbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-card">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-6">
+    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-card pt-[env(safe-area-inset-top)]">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
         <Link href={logoHref} className="flex items-center gap-2">
           <FinboardMark size={32} />
           <span className="hidden text-[15px] font-black tracking-[-0.04em] text-foreground sm:inline">Admin Console</span>

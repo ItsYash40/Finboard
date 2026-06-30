@@ -15,6 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  ResponsiveDataCell,
+  ResponsiveDataList
+} from "@/components/ui/responsive-data-list";
+import {
   Table,
   TableBody,
   TableCell,
@@ -127,24 +131,38 @@ export default function KycApplicationsTable({
         </div>
 
         {isLoading ? (
-          <div className="overflow-x-auto px-4 sm:px-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead>PAN</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>AI Score</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead className="text-right">Audit</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <TableRowSkeleton key={i} />
-                ))}
-              </TableBody>
-            </Table>
+          <div className="px-4 sm:px-0">
+            <ResponsiveDataList
+              loading
+              loadingSkeleton={{
+                mobile: Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2 rounded-xl border p-4">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-40" />
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                  </div>
+                )),
+                desktop: (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Applicant</TableHead>
+                        <TableHead>PAN</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>AI Score</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead className="text-right">Audit</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <TableRowSkeleton key={i} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                )
+              }}
+            />
           </div>
         ) : applications.length === 0 ? (
           <Empty className="border-0 py-12">
@@ -161,83 +179,106 @@ export default function KycApplicationsTable({
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="overflow-x-auto px-4 sm:px-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead className="hidden sm:table-cell">PAN</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">AI Score</TableHead>
-                  <TableHead className="hidden lg:table-cell">Submitted</TableHead>
-                  <TableHead className="text-right">Audit</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applications.map((item) => {
-                  const tag = getPriorityTag(item);
-                  const score = item.aiVerification?.overallScore;
-                  const age = timeAgo(item.submittedAt || item.createdAt);
+          <div className="px-4 sm:px-0">
+            <ResponsiveDataList
+              rows={applications}
+              getRowKey={(item) => item._id}
+              onRowClick={(item) => router.push(`/admin/kyc/${item._id}`)}
+              columns={[
+                { id: "applicant", label: "Applicant" },
+                { id: "pan", label: "PAN", hideBelow: "sm" },
+                { id: "status", label: "Status" },
+                { id: "score", label: "AI Score", hideBelow: "md" },
+                { id: "submitted", label: "Submitted", hideBelow: "lg" },
+                { id: "audit", label: "Audit", headClassName: "text-right" }
+              ]}
+              renderCard={(item) => {
+                const tag = getPriorityTag(item);
+                const score = item.aiVerification?.overallScore;
+                const age = timeAgo(item.submittedAt || item.createdAt);
 
-                  return (
-                    <TableRow
-                      key={item._id}
-                      className="cursor-pointer hover:bg-muted/40"
-                      onClick={() => router.push(`/admin/kyc/${item._id}`)}
-                    >
-                      <TableCell>
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
-                      </TableCell>
-                      <TableCell className="hidden font-mono text-sm sm:table-cell">
-                        {maskId(item.panNumber)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <StatusBadge status={item.status} />
-                          {tag ? (
-                            <span
-                              className={cn(
-                                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                                tag.cls
-                              )}
-                            >
-                              {tag.text}
-                            </span>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {typeof score === "number" ? (
-                          <AiScoreBadge score={score} />
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden text-sm text-muted-foreground lg:table-cell">
-                        {age || "—"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="size-8"
-                          asChild
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Link
-                            href={`/admin/audit/${item._id}`}
-                            aria-label={`View audit trail for ${item.name}`}
-                          >
-                            <History className="size-4" />
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                        <p className="truncate text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-8 shrink-0"
+                        asChild
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Link href={`/admin/audit/${item._id}`} aria-label={`View audit trail for ${item.name}`}>
+                          <History className="size-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <p className="text-muted-foreground">PAN</p>
+                        <p className="font-mono">{maskId(item.panNumber)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Submitted</p>
+                        <p>{age || "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <StatusBadge status={item.status} />
+                      {typeof score === "number" ? <AiScoreBadge score={score} /> : null}
+                      {tag ? (
+                        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", tag.cls)}>
+                          {tag.text}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              }}
+              renderRow={(item) => {
+                const tag = getPriorityTag(item);
+                const score = item.aiVerification?.overallScore;
+                const age = timeAgo(item.submittedAt || item.createdAt);
+
+                return (
+                  <>
+                    <ResponsiveDataCell>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="hidden font-mono text-sm sm:table-cell">
+                      {maskId(item.panNumber)}
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <StatusBadge status={item.status} />
+                        {tag ? (
+                          <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", tag.cls)}>
+                            {tag.text}
+                          </span>
+                        ) : null}
+                      </div>
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="hidden md:table-cell">
+                      {typeof score === "number" ? <AiScoreBadge score={score} /> : <span className="text-xs text-muted-foreground">—</span>}
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="hidden text-sm text-muted-foreground lg:table-cell">
+                      {age || "—"}
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="text-right">
+                      <Button variant="ghost" size="icon-sm" className="size-8" asChild onClick={(e) => e.stopPropagation()}>
+                        <Link href={`/admin/audit/${item._id}`} aria-label={`View audit trail for ${item.name}`}>
+                          <History className="size-4" />
+                        </Link>
+                      </Button>
+                    </ResponsiveDataCell>
+                  </>
+                );
+              }}
+            />
           </div>
         )}
 

@@ -26,7 +26,7 @@ export default function KycAiVerification({ aiVerification }) {
               </p>
               <p
                 className={cn(
-                  "text-5xl font-bold tabular-nums tracking-tight leading-none",
+                  "text-4xl font-bold tabular-nums tracking-tight leading-none sm:text-5xl",
                   aiVerification.overallScore >= 80
                     ? "text-emerald-700 dark:text-emerald-300"
                     : aiVerification.overallScore >= 50
@@ -79,7 +79,7 @@ export default function KycAiVerification({ aiVerification }) {
             </div>
 
             {aiVerification.alignments ? (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-3">
                 {[
                   { label: "User ↔ DB", value: aiVerification.alignments.userInputVsIdentity },
                   { label: "OCR ↔ DB", value: aiVerification.alignments.ocrVsIdentity },

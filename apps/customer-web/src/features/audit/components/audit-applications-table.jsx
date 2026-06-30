@@ -21,6 +21,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  ResponsiveDataCell,
+  ResponsiveDataList
+} from "@/components/ui/responsive-data-list";
+import {
   Table,
   TableBody,
   TableCell,
@@ -123,23 +127,37 @@ export default function AuditApplicationsTable({
         </div>
 
         {isLoading ? (
-          <div className="overflow-x-auto px-4 sm:px-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead>PAN</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <TableRowSkeleton key={i} />
-                ))}
-              </TableBody>
-            </Table>
+          <div className="px-4 sm:px-0">
+            <ResponsiveDataList
+              loading
+              loadingSkeleton={{
+                mobile: Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2 rounded-xl border p-4">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-40" />
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                  </div>
+                )),
+                desktop: (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Applicant</TableHead>
+                        <TableHead>PAN</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <TableRowSkeleton key={i} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                )
+              }}
+            />
           </div>
         ) : applications.length === 0 ? (
           <Empty className="border-0 py-12">
@@ -156,68 +174,102 @@ export default function AuditApplicationsTable({
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="overflow-x-auto px-4 sm:px-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead className="hidden sm:table-cell">PAN</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">Submitted</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applications.map((item) => {
-                  const age = timeAgo(item.submittedAt || item.createdAt);
+          <div className="px-4 sm:px-0">
+            <ResponsiveDataList
+              rows={applications}
+              getRowKey={(item) => item._id}
+              onRowClick={(item) => router.push(`/admin/audit/${item._id}`)}
+              columns={[
+                { id: "applicant", label: "Applicant" },
+                { id: "pan", label: "PAN", hideBelow: "sm" },
+                { id: "status", label: "Status" },
+                { id: "submitted", label: "Submitted", hideBelow: "lg" },
+                { id: "actions", label: "Actions", headClassName: "text-right" }
+              ]}
+              renderCard={(item) => {
+                const age = timeAgo(item.submittedAt || item.createdAt);
 
-                  return (
-                    <TableRow
-                      key={item._id}
-                      className="cursor-pointer hover:bg-muted/40"
-                      onClick={() => router.push(`/admin/audit/${item._id}`)}
-                    >
-                      <TableCell>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
-                      </TableCell>
-                      <TableCell className="hidden font-mono text-sm sm:table-cell">
-                        {maskId(item.panNumber)}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={item.status} />
-                      </TableCell>
-                      <TableCell className="hidden text-sm text-muted-foreground lg:table-cell">
-                        {age || "—"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div
-                          className="flex items-center justify-end gap-1"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button variant="ghost" size="icon-sm" className="size-8" asChild>
-                            <Link
-                              href={`/admin/audit/${item._id}`}
-                              aria-label={`View audit trail for ${item.name}`}
-                            >
-                              <History className="size-4" />
-                            </Link>
-                          </Button>
-                          <Button variant="ghost" size="icon-sm" className="size-8" asChild>
-                            <Link
-                              href={`/admin/kyc/${item._id}`}
-                              aria-label={`Open KYC review for ${item.name}`}
-                            >
-                              <ExternalLink className="size-4" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                return (
+                  <div className="space-y-3">
+                    <div className="min-w-0">
+                      <p className="font-medium">{item.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <p className="text-muted-foreground">PAN</p>
+                        <p className="font-mono">{maskId(item.panNumber)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Submitted</p>
+                        <p>{age || "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusBadge status={item.status} />
+                    </div>
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <Link href={`/admin/audit/${item._id}`}>
+                          <History className="mr-1.5 size-3.5" />
+                          Audit
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <Link href={`/admin/kyc/${item._id}`}>
+                          <ExternalLink className="mr-1.5 size-3.5" />
+                          KYC
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }}
+              renderRow={(item) => {
+                const age = timeAgo(item.submittedAt || item.createdAt);
+
+                return (
+                  <>
+                    <ResponsiveDataCell>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{item.user?.email || "No email"}</p>
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="hidden font-mono text-sm sm:table-cell">
+                      {maskId(item.panNumber)}
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell>
+                      <StatusBadge status={item.status} />
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="hidden text-sm text-muted-foreground lg:table-cell">
+                      {age || "—"}
+                    </ResponsiveDataCell>
+                    <ResponsiveDataCell className="text-right">
+                      <div
+                        className="flex items-center justify-end gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Button variant="ghost" size="icon-sm" className="size-8" asChild>
+                          <Link
+                            href={`/admin/audit/${item._id}`}
+                            aria-label={`View audit trail for ${item.name}`}
+                          >
+                            <History className="size-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="icon-sm" className="size-8" asChild>
+                          <Link
+                            href={`/admin/kyc/${item._id}`}
+                            aria-label={`Open KYC review for ${item.name}`}
+                          >
+                            <ExternalLink className="size-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </ResponsiveDataCell>
+                  </>
+                );
+              }}
+            />
           </div>
         )}
 

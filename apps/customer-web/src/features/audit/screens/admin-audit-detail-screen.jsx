@@ -25,15 +25,15 @@ export default function AdminAuditDetailScreen({ applicationId }) {
   return (
     <AdminShell>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <Button variant="outline" size="sm" className="gap-1.5" asChild>
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <Button variant="outline" size="sm" className="w-full gap-1.5 sm:w-auto" asChild>
             <Link href="/admin/audit">
               <ArrowLeft className="size-4" />
               Back to audit explorer
             </Link>
           </Button>
           {applicationId ? (
-            <Button variant="outline" size="sm" className="gap-1.5" asChild>
+            <Button variant="outline" size="sm" className="w-full gap-1.5 sm:w-auto" asChild>
               <Link href={`/admin/kyc/${applicationId}`}>
                 <ExternalLink className="size-4" />
                 Open KYC review

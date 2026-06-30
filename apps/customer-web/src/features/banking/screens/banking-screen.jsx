@@ -11,7 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  ResponsiveDataCell,
+  ResponsiveDataList
+} from "@/components/ui/responsive-data-list";
 import { getApiError } from "@/lib/api";
 import { bankingApi } from "../api/banking-api";
 
@@ -67,7 +70,7 @@ export default function BankingPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm text-primary">Banking Section</p>
-            <h1 className="text-3xl font-bold tracking-tight">Balance, transfers and history</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Balance, transfers and history</h1>
           </div>
           <Button variant="outline" asChild>
             <Link href="/profile?section=Bank%20Details">Manage Bank Accounts</Link>
@@ -98,7 +101,7 @@ export default function BankingPage() {
                   <CardTitle className="text-3xl">{rupee(account.balance)}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="break-all text-sm text-muted-foreground">
                     {account.holderName} / {account.bankName || "Finboard Demo Bank"} / {account.accountNumber} / {account.ifsc}
                   </p>
                 </CardContent>
@@ -118,9 +121,9 @@ export default function BankingPage() {
                       transferMutation.mutate(transferForm);
                     }}
                   >
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row">
                       <Input placeholder="Friend account number" value={transferForm.accountNumber} onChange={(event) => setTransferForm({ ...transferForm, accountNumber: event.target.value })} />
-                      <Button type="button" variant="secondary" onClick={() => lookupReceiver.mutate(transferForm.accountNumber)} disabled={!transferForm.accountNumber || lookupReceiver.isPending}>
+                      <Button type="button" variant="secondary" className="shrink-0 sm:w-auto" onClick={() => lookupReceiver.mutate(transferForm.accountNumber)} disabled={!transferForm.accountNumber || lookupReceiver.isPending}>
                         Find
                       </Button>
                     </div>
@@ -159,33 +162,51 @@ export default function BankingPage() {
                 </Select>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead className="hidden sm:table-cell">Account</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="hidden md:table-cell">Remarks</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {(transactions.data || []).map((txn) => (
-                        <TableRow key={txn.id}>
-                          <TableCell>{new Date(txn.createdAt).toLocaleString("en-IN")}</TableCell>
-                          <TableCell className={txn.type === "CREDIT" ? "text-up" : "text-down"}>{txn.type}</TableCell>
-                          <TableCell>{rupee(txn.amount)}</TableCell>
-                          <TableCell className="hidden sm:table-cell">{txn.type === "CREDIT" ? txn.senderAccountNumber || "-" : txn.receiverAccountNumber || "-"}</TableCell>
-                          <TableCell>{txn.status}</TableCell>
-                          <TableCell className="hidden md:table-cell">{txn.remarks || txn.description}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                {!transactions.data?.length ? <p className="py-4 text-sm text-muted-foreground">No transactions yet.</p> : null}
+                <ResponsiveDataList
+                  rows={transactions.data || []}
+                  getRowKey={(txn) => txn.id}
+                  columns={[
+                    { id: "date", label: "Date" },
+                    { id: "type", label: "Type" },
+                    { id: "amount", label: "Amount" },
+                    { id: "account", label: "Account", hideBelow: "sm" },
+                    { id: "status", label: "Status" },
+                    { id: "remarks", label: "Remarks", hideBelow: "md" }
+                  ]}
+                  emptyState={!transactions.data?.length ? <p className="py-4 text-sm text-muted-foreground">No transactions yet.</p> : null}
+                  renderCard={(txn) => (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-medium">{new Date(txn.createdAt).toLocaleString("en-IN")}</p>
+                        <span className={txn.type === "CREDIT" ? "text-up" : "text-down"}>{txn.type}</span>
+                      </div>
+                      <p className="text-lg font-semibold">{rupee(txn.amount)}</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-muted-foreground">Account</p>
+                          <p className="break-all">{txn.type === "CREDIT" ? txn.senderAccountNumber || "-" : txn.receiverAccountNumber || "-"}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Status</p>
+                          <p>{txn.status}</p>
+                        </div>
+                      </div>
+                      {txn.remarks || txn.description ? (
+                        <p className="text-xs text-muted-foreground">{txn.remarks || txn.description}</p>
+                      ) : null}
+                    </div>
+                  )}
+                  renderRow={(txn) => (
+                    <>
+                      <ResponsiveDataCell>{new Date(txn.createdAt).toLocaleString("en-IN")}</ResponsiveDataCell>
+                      <ResponsiveDataCell className={txn.type === "CREDIT" ? "text-up" : "text-down"}>{txn.type}</ResponsiveDataCell>
+                      <ResponsiveDataCell>{rupee(txn.amount)}</ResponsiveDataCell>
+                      <ResponsiveDataCell className="hidden sm:table-cell">{txn.type === "CREDIT" ? txn.senderAccountNumber || "-" : txn.receiverAccountNumber || "-"}</ResponsiveDataCell>
+                      <ResponsiveDataCell>{txn.status}</ResponsiveDataCell>
+                      <ResponsiveDataCell className="hidden md:table-cell">{txn.remarks || txn.description}</ResponsiveDataCell>
+                    </>
+                  )}
+                />
               </CardContent>
             </Card>
           </>

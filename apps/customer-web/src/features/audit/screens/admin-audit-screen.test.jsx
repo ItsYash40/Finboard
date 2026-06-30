@@ -55,7 +55,7 @@ describe("AdminAuditScreen", () => {
     renderWithClient(<AdminAuditScreen />);
 
     expect(await screen.findByText("Audit Trail Explorer")).toBeInTheDocument();
-    expect(await screen.findByText("Anurag Swarnakar")).toBeInTheDocument();
+    expect(screen.getAllByText("Anurag Swarnakar").length).toBeGreaterThan(0);
     expect(screen.getByText("Tracked applications")).toBeInTheDocument();
   });
 

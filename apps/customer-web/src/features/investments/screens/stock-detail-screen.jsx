@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { AppLayout } from "@/features/layout";
+import { stickyBelowHeader } from "@/features/layout/lib/responsive";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -146,7 +147,7 @@ export default function StockDetailPage() {
 
   return (
     <AppLayout>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_min(360px,100%)]">
         <section className="space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex flex-wrap items-start gap-4">
@@ -273,7 +274,7 @@ export default function StockDetailPage() {
         </section>
 
         <aside>
-          <Card className="sticky top-6">
+          <Card className={cn(stickyBelowHeader)}>
             <CardHeader className="border-b">
               <div className="flex items-center justify-between gap-2">
                 <CardTitle>{item.symbol}</CardTitle>

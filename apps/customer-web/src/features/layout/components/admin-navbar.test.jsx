@@ -54,4 +54,19 @@ describe("AdminNavbar", () => {
     expect(within(desktopNav).getByRole("link", { name: "Banking" })).toBeInTheDocument();
     expect(within(desktopNav).getByRole("link", { name: "AMC" })).toBeInTheDocument();
   });
+
+  it("uses aligned shell padding and safe-area on the sticky header", () => {
+    useAuth.mockReturnValue({
+      user: { role: "admin", email: "admin@finboard.local" },
+      logout: vi.fn()
+    });
+
+    const { container } = render(<AdminNavbar />);
+    const header = container.querySelector("header");
+    const inner = header?.querySelector("div");
+
+    expect(inner?.className).toMatch(/px-4/);
+    expect(inner?.className).toMatch(/sm:px-6/);
+    expect(header?.className).toMatch(/safe-area-inset-top/);
+  });
 });

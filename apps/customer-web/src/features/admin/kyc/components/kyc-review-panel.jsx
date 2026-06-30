@@ -94,7 +94,7 @@ export function KycReviewPanel({
   const aiVerification = review?.aiVerification || selected?.application?.aiVerification;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 md:pb-0">
       <KycReviewHeader
         application={selected.application}
         user={selected.user}

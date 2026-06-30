@@ -55,7 +55,7 @@ export default function AmcAdminPage() {
           <StatCard icon={PauseCircle} label="Pending Orders" value={summary.pendingOrders || 0} tone="warning" />
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
           <Card>
             <CardContent className="pt-6">
               <AdminSection
@@ -63,11 +63,11 @@ export default function AmcAdminPage() {
                 description="AMC order book"
                 action={<BarChart3 className="size-5 text-primary" />}
               >
-              <ScrollArea className="h-[min(70vh,720px)] pr-4">
+              <ScrollArea className="h-auto max-h-[min(70vh,720px)] pr-4 lg:h-[min(70vh,720px)]">
                 <div className="space-y-4">
                   {mutualFundOrders.map((order) => (
                     <Card key={order._id} size="sm">
-                      <CardContent className="grid gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+                      <CardContent className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
                         <div className="space-y-1">
                           <strong className="block">{order.name}</strong>
                           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">

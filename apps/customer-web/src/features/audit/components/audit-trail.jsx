@@ -32,7 +32,7 @@ function AuditEntryDetails({ entry }) {
             View full event details
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <pre className="mt-2 max-h-40 overflow-auto rounded-lg border border-border bg-muted/40 p-3 text-xs whitespace-pre-wrap text-muted-foreground">
+            <pre className="mt-2 max-h-40 overflow-x-auto overflow-y-auto rounded-lg border border-border bg-muted/40 p-3 text-xs whitespace-pre-wrap text-muted-foreground">
               {JSON.stringify(entry.details, null, 2)}
             </pre>
           </CollapsibleContent>

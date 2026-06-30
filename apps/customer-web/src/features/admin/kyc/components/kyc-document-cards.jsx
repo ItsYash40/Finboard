@@ -153,7 +153,7 @@ export default function KycDocumentCards({ panDoc, aadhaarDoc, onRefreshDocument
           <button
             type="button"
             aria-label="Close preview"
-            className="absolute right-5 top-5 flex size-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+            className="absolute right-[max(1.25rem,env(safe-area-inset-right))] top-[max(1.25rem,env(safe-area-inset-top))] flex size-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
             onClick={() => setExpandSrc(null)}
           >
             <X className="size-5" />

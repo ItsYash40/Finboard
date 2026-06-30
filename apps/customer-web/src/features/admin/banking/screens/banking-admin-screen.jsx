@@ -7,7 +7,10 @@ import { StatCard } from "@/features/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  ResponsiveDataCell,
+  ResponsiveDataList
+} from "@/components/ui/responsive-data-list";
 import { bankingApi } from "../../../banking/api/banking-api";
 import { getApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -47,51 +50,83 @@ export default function BankingAdminPage() {
         <Card>
           <CardContent className="pt-6">
             <AdminSection title="All Accounts">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Account</TableHead>
-                    <TableHead className="hidden sm:table-cell">IFSC</TableHead>
-                    <TableHead>Balance</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(users.data || []).map((account) => (
-                    <TableRow key={account.id}>
-                      <TableCell className="font-medium">{account.holderName}</TableCell>
-                      <TableCell>{account.accountNumber}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{account.ifsc}</TableCell>
-                      <TableCell className="font-semibold">{rupee(account.balance)}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            account.status === "FROZEN" &&
-                              "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400"
-                          )}
-                        >
-                          {account.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant={account.status === "FROZEN" ? "default" : "outline"}
-                          onClick={() => freeze.mutate({ id: account.id, frozen: account.status !== "FROZEN" })}
-                        >
-                          {account.status === "FROZEN" ? "Unfreeze" : "Freeze"}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <ResponsiveDataList
+              rows={users.data || []}
+              getRowKey={(account) => account.id}
+              columns={[
+                { id: "name", label: "Name" },
+                { id: "account", label: "Account" },
+                { id: "ifsc", label: "IFSC", hideBelow: "sm" },
+                { id: "balance", label: "Balance" },
+                { id: "status", label: "Status" },
+                { id: "action", label: "Action", headClassName: "text-right" }
+              ]}
+              renderCard={(account) => (
+                <div className="space-y-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">{account.holderName}</p>
+                    <p className="break-all text-xs text-muted-foreground">{account.accountNumber}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <p className="text-muted-foreground">IFSC</p>
+                      <p className="font-mono">{account.ifsc}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Balance</p>
+                      <p className="font-semibold">{rupee(account.balance)}</p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      account.status === "FROZEN" &&
+                        "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400"
+                    )}
+                  >
+                    {account.status}
+                  </Badge>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full"
+                    variant={account.status === "FROZEN" ? "default" : "outline"}
+                    onClick={() => freeze.mutate({ id: account.id, frozen: account.status !== "FROZEN" })}
+                  >
+                    {account.status === "FROZEN" ? "Unfreeze" : "Freeze"}
+                  </Button>
+                </div>
+              )}
+              renderRow={(account) => (
+                <>
+                  <ResponsiveDataCell className="font-medium">{account.holderName}</ResponsiveDataCell>
+                  <ResponsiveDataCell>{account.accountNumber}</ResponsiveDataCell>
+                  <ResponsiveDataCell className="hidden sm:table-cell">{account.ifsc}</ResponsiveDataCell>
+                  <ResponsiveDataCell className="font-semibold">{rupee(account.balance)}</ResponsiveDataCell>
+                  <ResponsiveDataCell>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        account.status === "FROZEN" &&
+                          "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400"
+                      )}
+                    >
+                      {account.status}
+                    </Badge>
+                  </ResponsiveDataCell>
+                  <ResponsiveDataCell className="text-right">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={account.status === "FROZEN" ? "default" : "outline"}
+                      onClick={() => freeze.mutate({ id: account.id, frozen: account.status !== "FROZEN" })}
+                    >
+                      {account.status === "FROZEN" ? "Unfreeze" : "Freeze"}
+                    </Button>
+                  </ResponsiveDataCell>
+                </>
+              )}
+            />
             </AdminSection>
           </CardContent>
         </Card>

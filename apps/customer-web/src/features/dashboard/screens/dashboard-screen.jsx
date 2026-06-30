@@ -29,7 +29,10 @@ import {
   PaginationPrevious
 } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  ResponsiveDataCell,
+  ResponsiveDataList
+} from "@/components/ui/responsive-data-list";
 import { api, getApiError } from "@/lib/api";
 import { bankingApi } from "../../banking/api/banking-api";
 import { investmentApi } from "../../investments/api/investment-api";
@@ -166,6 +169,21 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Market segment switcher — visible below lg where navbar tabs are hidden */}
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
+          {Object.entries(tabs).map(([key, tab]) => (
+            <Button
+              key={key}
+              variant={marketKey === key ? "default" : "outline"}
+              size="sm"
+              className="shrink-0 rounded-full"
+              asChild
+            >
+              <Link href={`/dashboard?market=${key}`}>{tab.label}</Link>
+            </Button>
+          ))}
+        </div>
+
         {/* Index strip — stocks view */}
         {marketKey === "stocks" ? <MarketIndexStrip indices={indices.slice(0, 7)} /> : null}
 
@@ -234,7 +252,7 @@ export default function DashboardPage() {
           </Card>
         ) : null}
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           <div className="space-y-6">
             {/* Instrument grid */}
             <Card>
@@ -256,7 +274,7 @@ export default function DashboardPage() {
 
                 {pageCount > 1 ? (
                   <Pagination>
-                    <PaginationContent className="gap-1">
+                    <PaginationContent className="flex-wrap justify-center gap-1 overflow-x-auto">
                       <PaginationItem>
                         <PaginationPrevious
                           href="#"
@@ -307,55 +325,70 @@ export default function DashboardPage() {
                 <CardTitle>{marketKey === "mutual-funds" ? "SIP ideas" : "Top movers today"}</CardTitle>
               </CardHeader>
               <CardContent className="px-0 sm:px-6">
-                <div className="overflow-x-auto">
-                  <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Price / plan</TableHead>
-                      <TableHead>Move / risk</TableHead>
-                      <TableHead className="hidden md:table-cell">Volume / return</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {market.movers.map((row) => {
-                      const isDown = String(row[2]).startsWith("-");
-                      return (
-                        <TableRow key={row[0]}>
-                          <TableCell className="max-w-[180px] font-medium">{row[0]}</TableCell>
-                          <TableCell className="tabular-nums">{row[1]}</TableCell>
-                          <TableCell>
-                            <span className={cn("inline-flex items-center gap-1 font-medium", isDown ? "text-down" : "text-up")}>
-                              {isDown ? (
-                                <TrendingDown className="size-3.5" aria-hidden />
-                              ) : (
-                                <TrendingUp className="size-3.5" aria-hidden />
-                              )}
-                              {row[2]}
-                            </span>
-                          </TableCell>
-                          <TableCell className="hidden tabular-nums md:table-cell">{row[3]}</TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="rounded-full text-[10px]">
-                              Live
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button variant="ghost" size="sm" className="gap-1" asChild>
-                              <Link href={`/stocks/${row[4] || market.cards[0]?.symbol || "RELI"}`}>
-                                View
-                                <ChevronRight className="size-3.5" aria-hidden />
-                              </Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                  </Table>
-                </div>
+                <ResponsiveDataList
+                  rows={market.movers}
+                  getRowKey={(row) => row[0]}
+                  columns={[
+                    { id: "name", label: "Name" },
+                    { id: "price", label: "Price / plan" },
+                    { id: "move", label: "Move / risk" },
+                    { id: "volume", label: "Volume / return", hideBelow: "md" },
+                    { id: "status", label: "Status" },
+                    { id: "action", label: "Action", headClassName: "text-right" }
+                  ]}
+                  renderCard={(row) => {
+                    const isDown = String(row[2]).startsWith("-");
+                    return (
+                      <div className="space-y-3">
+                        <div className="min-w-0">
+                          <p className="font-medium">{row[0]}</p>
+                          <p className="tabular-nums text-sm text-muted-foreground">{row[1]}</p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className={cn("inline-flex items-center gap-1 font-medium", isDown ? "text-down" : "text-up")}>
+                            {isDown ? <TrendingDown className="size-3.5" aria-hidden /> : <TrendingUp className="size-3.5" aria-hidden />}
+                            {row[2]}
+                          </span>
+                          <Badge variant="secondary" className="rounded-full text-[10px]">Live</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Volume / return: {row[3]}</p>
+                        <Button variant="outline" size="sm" className="w-full gap-1" asChild>
+                          <Link href={`/stocks/${row[4] || market.cards[0]?.symbol || "RELI"}`}>
+                            View
+                            <ChevronRight className="size-3.5" aria-hidden />
+                          </Link>
+                        </Button>
+                      </div>
+                    );
+                  }}
+                  renderRow={(row) => {
+                    const isDown = String(row[2]).startsWith("-");
+                    return (
+                      <>
+                        <ResponsiveDataCell className="max-w-[180px] font-medium">{row[0]}</ResponsiveDataCell>
+                        <ResponsiveDataCell className="tabular-nums">{row[1]}</ResponsiveDataCell>
+                        <ResponsiveDataCell>
+                          <span className={cn("inline-flex items-center gap-1 font-medium", isDown ? "text-down" : "text-up")}>
+                            {isDown ? <TrendingDown className="size-3.5" aria-hidden /> : <TrendingUp className="size-3.5" aria-hidden />}
+                            {row[2]}
+                          </span>
+                        </ResponsiveDataCell>
+                        <ResponsiveDataCell className="hidden tabular-nums md:table-cell">{row[3]}</ResponsiveDataCell>
+                        <ResponsiveDataCell>
+                          <Badge variant="secondary" className="rounded-full text-[10px]">Live</Badge>
+                        </ResponsiveDataCell>
+                        <ResponsiveDataCell className="text-right">
+                          <Button variant="ghost" size="sm" className="gap-1" asChild>
+                            <Link href={`/stocks/${row[4] || market.cards[0]?.symbol || "RELI"}`}>
+                              View
+                              <ChevronRight className="size-3.5" aria-hidden />
+                            </Link>
+                          </Button>
+                        </ResponsiveDataCell>
+                      </>
+                    );
+                  }}
+                />
               </CardContent>
             </Card>
 

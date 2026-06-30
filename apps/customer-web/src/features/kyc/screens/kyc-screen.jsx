@@ -308,7 +308,7 @@ export default function KycPage() {
                     </span>
                     <p className="text-sm font-medium">No application yet</p>
                     <p className="text-xs text-muted-foreground">
-                      Upload your PAN and Aadhaar on the left to get started.
+                      Upload your PAN and Aadhaar in the form to get started.
                     </p>
                   </div>
                 )}
