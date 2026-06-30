@@ -17,6 +17,14 @@ x-prod-env: &prod-env
   S3_REGION: ${AWS_REGION:-us-east-1}
   S3_BUCKET: ${S3_BUCKET}
   CLIENT_ORIGIN: "https://finboard.saswat.app"
+  # Resend — real email delivery (otherwise falls back to dev/log-only mode)
+  RESEND_API_KEY: ${RESEND_API_KEY}
+  RESEND_FROM: ${RESEND_FROM}
+  # OCR/KYC document verification
+  MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+  OPENROUTER_MODEL: ${OPENROUTER_MODEL}
+  OPENROUTER_VISION_MODEL: ${OPENROUTER_VISION_MODEL}
 
 services:
   # ── Disable local Postgres — using Neon DB ──────────────────────────────
